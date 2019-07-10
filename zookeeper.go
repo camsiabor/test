@@ -11,6 +11,11 @@ func GetZookeeper(id string, endpoint string) (*zk.Conn, error) {
 	var err error
 	var conn = zkconns[id]
 	if conn == nil {
+
+		if len(endpoint) == 0 {
+			return nil, nil
+		}
+
 		conn, _, err = zk.Connect([]string{endpoint}, time.Duration(15)*time.Second)
 		if err != nil {
 			return nil, err

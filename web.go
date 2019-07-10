@@ -7,6 +7,7 @@ import (
 	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/gin-gonic/gin"
+	"github.com/samuel/go-zookeeper/zk"
 	"net/http"
 	"strconv"
 	"time"
@@ -60,7 +61,12 @@ func initWeb() {
 func initRoute(engine *gin.Engine) {
 
 	engine.GET("/call", call)
-	engine.GET("/zkiter", zkiter)
+
+	engine.GET("/zk/iter", zkiter)
+	engine.GET("/zk/create", zkcreate)
+	engine.GET("/zk/delete", zkiter)
+	engine.GET("/zk/put", zkiter)
+	engine.GET("/zk/get", zkiter)
 
 }
 
@@ -100,10 +106,10 @@ func call(context *gin.Context) {
 }
 
 func zkiter(context *gin.Context) {
-	var endpoint = context.Query("endpoint")
-	var path = context.Query("path")
-	var depth, _ = strconv.Atoi(context.Query("depth"))
 	var id = context.Query("id")
+	var path = context.Query("path")
+	var endpoint = context.Query("endpoint")
+	var depth, _ = strconv.Atoi(context.Query("depth"))
 
 	if len(id) == 0 {
 		id = endpoint
@@ -128,5 +134,29 @@ func zkiter(context *gin.Context) {
 }
 
 func zkcreate(context *gin.Context) {
+	var id = context.Query("id")
+	var path = context.Query("path")
+	var data = context.Query("data")
+	var ephemeral, _ = strconv.Atoi(context.Query("ephe"))
+	var sequential, _ = strconv.Atoi(context.Query("seq"))
+	var conn, _ = GetZookeeper(id, "")
+
+	if conn == nil {
+		context.String(500, "id not found "+id)
+		return
+	}
+	var flag int32
+	if ephemeral >= 1 {
+		flag = flag | zk.FlagEphemeral
+	}
+	if sequential >= 1 {
+		flag = flag | zk.FlagSequence
+	}
+	var cpath, err = conn.Create(path, []byte(data), flag, zk.WorldACL(zk.PermAll))
+	if err == nil {
+		context.String(200, "created "+cpath)
+	} else {
+		context.String(500, "created fail "+path+" : "+err.Error())
+	}
 
 }
