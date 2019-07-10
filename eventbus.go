@@ -3,13 +3,24 @@ package main
 import (
 	"fmt"
 	"github.com/camsiabor/qservice/core"
-	"github.com/camsiabor/qservice/impl/memory"
+	"github.com/camsiabor/qservice/impl/zookeeper"
+	"time"
 )
 
-var gateway = &memory.MemoryGateway{}
-var overseer = &core.Overseer{}
+var gateway core.Gateway
+var overseer *core.Overseer
 
 func initService() {
+
+	//gateway = &memory.MGateway{}
+	var zgateway = &zookeeper.ZGateway{}
+
+	zgateway.Endpoints = []string{"127.0.0.1:12181"}
+	zgateway.SessionTimeout = time.Duration(30) * time.Second
+
+	gateway = zgateway
+
+	overseer = &core.Overseer{}
 
 	fmt.Println("[service] initiating")
 

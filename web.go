@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/camsiabor/qcom/qlog"
+	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qservice/core"
+	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"runtime"
 	"strconv"
 	"time"
 )
@@ -36,46 +37,12 @@ func initWeb() {
 	gin.SetMode("release")
 
 	var engine = gin.Default()
-	engine.GET("/call", func(context *gin.Context) {
-		var data = context.Query("data")
-		var address = context.Query("address")
-		var timeout = context.Query("timeout")
 
-		var request = core.NewMessage(address, data, time.Duration(15)*time.Second)
-
-		if len(timeout) > 0 {
-			var itimeout, err = strconv.ParseInt(timeout, 10, 64)
-			if err != nil {
-				context.String(500, fmt.Sprintf("%v", err))
-				return
-			}
-			request.Timeout = time.Duration(itimeout) * time.Second
-		}
-
-		var response, err = overseer.Post(request)
-
-		if err != nil {
-			var reply = fmt.Sprintf("%v", err)
-			context.String(500, reply)
-			return
-		}
-
-		if response.IsError() {
-			var reply = fmt.Sprintf("%v", response.ReplyErr)
-			context.String(500, reply)
-			return
-		}
-
-		var reply = fmt.Sprintf("%v", response.ReplyData)
-		context.String(200, reply)
-
-	})
+	initRoute(engine)
 
 	engine.Use(QRecovery(func(c *gin.Context, err interface{}) {
-		var bytes = make([]byte, 8192)
-		var stack = runtime.Stack(bytes, false)
-		var stackString = string(bytes[:stack])
-		c.String(500, stackString)
+
+		c.String(500, qref.StackStringErr(err, 0))
 	}))
 
 	go func() {
@@ -87,5 +54,79 @@ func initWeb() {
 			panic(err)
 		}
 	}()
+
+}
+
+func initRoute(engine *gin.Engine) {
+
+	engine.GET("/call", call)
+	engine.GET("/zkiter", zkiter)
+
+}
+
+func call(context *gin.Context) {
+	var data = context.Query("data")
+	var address = context.Query("address")
+	var timeout = context.Query("timeout")
+
+	var request = core.NewMessage(address, data, time.Duration(15)*time.Second)
+
+	if len(timeout) > 0 {
+		var itimeout, err = strconv.ParseInt(timeout, 10, 64)
+		if err != nil {
+			context.String(500, fmt.Sprintf("%v", err))
+			return
+		}
+		request.Timeout = time.Duration(itimeout) * time.Second
+	}
+
+	var response, err = overseer.Post(request)
+
+	if err != nil {
+		var reply = fmt.Sprintf("%v", err)
+		context.String(500, reply)
+		return
+	}
+
+	if response.IsError() {
+		var reply = fmt.Sprintf("%v", response.ReplyErr)
+		context.String(500, reply)
+		return
+	}
+
+	var reply = fmt.Sprintf("%v", response.ReplyData)
+	context.String(200, reply)
+
+}
+
+func zkiter(context *gin.Context) {
+	var endpoint = context.Query("endpoint")
+	var path = context.Query("path")
+	var depth, _ = strconv.Atoi(context.Query("depth"))
+	var id = context.Query("id")
+
+	if len(id) == 0 {
+		id = endpoint
+	}
+
+	var conn, err = GetZookeeper(id, endpoint)
+	if err != nil {
+		context.String(500, qref.StackStringErr(err, 0))
+		return
+	}
+	if depth < 0 {
+		depth = 0
+	}
+	var reply = ""
+	var all = []string{path}
+	_ = zookeeper.Iterate(conn, path, path, depth, func(current string, parent string, root string, depth int) bool {
+		reply = reply + "\n" + current
+		all = append(all, current)
+		return true
+	})
+	context.String(200, reply)
+}
+
+func zkcreate(context *gin.Context) {
 
 }
