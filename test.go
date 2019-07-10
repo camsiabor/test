@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/camsiabor/qservice/core"
-	"github.com/camsiabor/qservice/impl"
 	"time"
 )
 

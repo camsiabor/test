@@ -25,7 +25,7 @@ func initService() {
 
 	err := overseer.ServiceRegister("qam.echo", nil, func(message *core.Message) {
 		_, _ = fmt.Printf("echo %v\n", message.Data)
-		_ = message.Reply(message.Data)
+		_ = message.Reply(0, message.Data)
 	})
 
 	if err != nil {

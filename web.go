@@ -51,9 +51,16 @@ func initWeb() {
 			}
 		}
 
-		var ret, _ = overseer.Post(message)
-		var reply = fmt.Sprintf("%v", ret)
-		context.String(200, reply)
+		_, _ = overseer.Post(message.SetHandler(func(response *core.Message) {
+			if response.IsError() {
+				var reply = fmt.Sprintf("%v", response.ReplyErr)
+				context.String(500, reply)
+			} else {
+				var reply = fmt.Sprintf("%v", response.ReplyData)
+				context.String(200, reply)
+			}
+		}))
+
 	})
 
 	engine.Use(QRecovery(func(c *gin.Context, err interface{}) {
