@@ -40,26 +40,26 @@ func initWeb() {
 		var address = context.Query("address")
 		var timeout = context.Query("timeout")
 
-		var message = core.NewMessage(address, data, 0, nil, nil)
+		var request = core.NewMessage(address, data, 15*1000, nil, nil)
 
 		if len(timeout) > 0 {
 			var err error
-			message.Timeout, err = strconv.ParseInt(timeout, 10, 64)
+			request.Timeout, err = strconv.ParseInt(timeout, 10, 64)
 			if err != nil {
 				context.String(500, fmt.Sprintf("%v", err))
 				return
 			}
 		}
 
-		_, _ = overseer.Post(message.SetHandler(func(response *core.Message) {
-			if response.IsError() {
-				var reply = fmt.Sprintf("%v", response.ReplyErr)
-				context.String(500, reply)
-			} else {
-				var reply = fmt.Sprintf("%v", response.ReplyData)
-				context.String(200, reply)
-			}
-		}))
+		var response, _ = overseer.Post(request)
+
+		if response.IsError() {
+			var reply = fmt.Sprintf("%v", response.ReplyErr)
+			context.String(500, reply)
+		} else {
+			var reply = fmt.Sprintf("%v", response.ReplyData)
+			context.String(200, reply)
+		}
 
 	})
 
