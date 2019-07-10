@@ -5,11 +5,11 @@ import (
 	"github.com/camsiabor/qcom/qlog"
 	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qservice/core"
-	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/gin-gonic/gin"
 	"github.com/samuel/go-zookeeper/zk"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -115,7 +115,7 @@ func zkiter(context *gin.Context) {
 		id = endpoint
 	}
 
-	var conn, err = GetZookeeper(id, endpoint)
+	var conn, err = ZkConn(id, endpoint)
 	if err != nil {
 		context.String(500, qref.StackStringErr(err, 0))
 		return
@@ -123,14 +123,18 @@ func zkiter(context *gin.Context) {
 	if depth < 0 {
 		depth = 0
 	}
-	var reply = ""
-	var all = []string{path}
-	_ = zookeeper.Iterate(conn, path, path, depth, func(current string, parent string, root string, depth int) bool {
-		reply = reply + "\n" + current
-		all = append(all, current)
+	var builder strings.Builder
+	_ = ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
+		builder.WriteString("\n")
+		builder.WriteString(current)
+		var _, stat, err = conn.Get(current)
+		if err == nil {
+			var info = fmt.Sprintf("   %d", stat.DataLength)
+			builder.WriteString(info)
+		}
 		return true
 	})
-	context.String(200, reply)
+	context.String(200, builder.String())
 }
 
 func zkcreate(context *gin.Context) {
@@ -139,7 +143,7 @@ func zkcreate(context *gin.Context) {
 	var data = context.Query("data")
 	var ephemeral, _ = strconv.Atoi(context.Query("ephe"))
 	var sequential, _ = strconv.Atoi(context.Query("seq"))
-	var conn, _ = GetZookeeper(id, "")
+	var conn, _ = ZkConn(id, "")
 
 	if conn == nil {
 		context.String(500, "id not found "+id)
