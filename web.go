@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"runtime"
 	"strconv"
+	"time"
 )
 
 func QRecovery(f func(c *gin.Context, err interface{})) gin.HandlerFunc {
@@ -40,26 +41,33 @@ func initWeb() {
 		var address = context.Query("address")
 		var timeout = context.Query("timeout")
 
-		var request = core.NewMessage(address, data, 15*1000, nil, nil)
+		var request = core.NewMessage(address, data, time.Duration(15)*time.Second)
 
 		if len(timeout) > 0 {
-			var err error
-			request.Timeout, err = strconv.ParseInt(timeout, 10, 64)
+			var itimeout, err = strconv.ParseInt(timeout, 10, 64)
 			if err != nil {
 				context.String(500, fmt.Sprintf("%v", err))
 				return
 			}
+			request.Timeout = time.Duration(itimeout) * time.Second
 		}
 
-		var response, _ = overseer.Post(request)
+		var response, err = overseer.Post(request)
+
+		if err != nil {
+			var reply = fmt.Sprintf("%v", err)
+			context.String(500, reply)
+			return
+		}
 
 		if response.IsError() {
 			var reply = fmt.Sprintf("%v", response.ReplyErr)
 			context.String(500, reply)
-		} else {
-			var reply = fmt.Sprintf("%v", response.ReplyData)
-			context.String(200, reply)
+			return
 		}
+
+		var reply = fmt.Sprintf("%v", response.ReplyData)
+		context.String(200, reply)
 
 	})
 

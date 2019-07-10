@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/camsiabor/qservice/core"
-	"github.com/camsiabor/qservice/impl"
+	"github.com/camsiabor/qservice/impl/memory"
 )
 
-var gateway = &impl.MemoryGateway{}
+var gateway = &memory.MemoryGateway{}
 var overseer = &core.Overseer{}
 
 func initService() {
