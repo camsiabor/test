@@ -5,7 +5,6 @@ import (
 	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/zookeeper"
-	"time"
 )
 
 var localGateway core.Gateway
@@ -20,6 +19,7 @@ func InitEventBus() {
 }
 
 func initLocalService() {
+
 	localGateway = &memory.MGateway{}
 	localOverseer = &core.Overseer{}
 
@@ -47,11 +47,7 @@ func initLocalService() {
 
 func initClusterService() {
 
-	var zgateway = &zookeeper.ZGateway{}
-	zgateway.Endpoints = []string{"127.0.0.1:12181"}
-	zgateway.SessionTimeout = time.Duration(30) * time.Second
-
-	clusterGateway = zgateway
+	clusterGateway = &zookeeper.ZGateway{}
 	clusterOverseer = &core.Overseer{}
 
 	fmt.Println("[service] cluster initiating")

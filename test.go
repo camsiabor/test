@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/camsiabor/test/eventbus"
 	"github.com/camsiabor/test/httpt"
-	"github.com/camsiabor/test/zkt"
 	"time"
 )
 
@@ -12,7 +11,7 @@ func main() {
 
 	eventbus.InitEventBus()
 
-	zkt.InitZkTService()
+	eventbus.InitZkTService()
 
 	httpt.InitWeb(":5555")
 

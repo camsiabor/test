@@ -8,14 +8,10 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/test/eventbus"
-	"github.com/camsiabor/test/zkt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/samuel/go-zookeeper/zk"
 	"net/http"
 	"path/filepath"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -67,12 +63,6 @@ func InitWeb(address string) {
 func initRoute(engine *gin.Engine) {
 
 	engine.GET("/call", callp)
-
-	engine.GET("/zk/iter", zkiter)
-	engine.GET("/zk/create", zkcreate)
-	engine.GET("/zk/delete", zkiter)
-	engine.GET("/zk/put", zkiter)
-	engine.GET("/zk/get", zkiter)
 
 	var root = "../src/github.com/camsiabor/test/web"
 	root, _ = filepath.Abs(root)
@@ -196,65 +186,5 @@ func callp(context *gin.Context) {
 	}
 	var reply = fmt.Sprintf("%v", ret)
 	context.String(200, reply)
-
-}
-
-func zkiter(context *gin.Context) {
-	var id = context.Query("id")
-	var path = context.Query("path")
-	var endpoint = context.Query("endpoint")
-	var depth, _ = strconv.Atoi(context.Query("depth"))
-
-	if len(id) == 0 {
-		id = endpoint
-	}
-
-	var conn, err = zkt.ZkConn(id, endpoint)
-	if err != nil {
-		context.String(500, qref.StackStringErr(err, 0))
-		return
-	}
-	if depth < 0 {
-		depth = 0
-	}
-	var builder strings.Builder
-	_ = zkt.ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
-		builder.WriteString("\n")
-		builder.WriteString(current)
-		var _, stat, err = conn.Get(current)
-		if err == nil {
-			var info = fmt.Sprintf("   %d", stat.DataLength)
-			builder.WriteString(info)
-		}
-		return true
-	})
-	context.String(200, builder.String())
-}
-
-func zkcreate(context *gin.Context) {
-	var id = context.Query("id")
-	var path = context.Query("path")
-	var data = context.Query("data")
-	var ephemeral, _ = strconv.Atoi(context.Query("ephe"))
-	var sequential, _ = strconv.Atoi(context.Query("seq"))
-	var conn, _ = zkt.ZkConn(id, "")
-
-	if conn == nil {
-		context.String(500, "id not found "+id)
-		return
-	}
-	var flag int32
-	if ephemeral >= 1 {
-		flag = flag | zk.FlagEphemeral
-	}
-	if sequential >= 1 {
-		flag = flag | zk.FlagSequence
-	}
-	var cpath, err = conn.Create(path, []byte(data), flag, zk.WorldACL(zk.PermAll))
-	if err == nil {
-		context.String(200, "created "+cpath)
-	} else {
-		context.String(500, "created fail "+path+" : "+err.Error())
-	}
 
 }

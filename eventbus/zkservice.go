@@ -1,10 +1,10 @@
-package zkt
+package eventbus
 
 import (
 	"fmt"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
-	"github.com/camsiabor/test/eventbus"
+	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/samuel/go-zookeeper/zk"
 	"strings"
 )
@@ -18,11 +18,11 @@ func getParams(message *core.Message) (request map[string]interface{}, id string
 }
 
 func InitZkTService() {
-	var overseer = eventbus.GetOverseer(true)
+	var overseer = GetOverseer(true)
 
 	_ = overseer.ServiceRegister("qam.zk.conn", nil, func(message *core.Message) {
 		var _, id, endpoint, _ = getParams(message)
-		var _, err = ZkConn(id, endpoint)
+		var _, err = zookeeper.ZooWatcherGet(id, endpoint)
 		if err == nil {
 			_ = message.Reply(0, id+" connected")
 		} else {
@@ -32,7 +32,10 @@ func InitZkTService() {
 
 	_ = overseer.ServiceRegister("qam.zk.close", nil, func(message *core.Message) {
 		var _, id, _, _ = getParams(message)
-		ZkClose(id)
+		var watcher, _ = zookeeper.ZooWatcherGet(id, "")
+		if watcher != nil {
+			_ = watcher.Stop(nil)
+		}
 		_ = message.Reply(0, id+" closed")
 	})
 
@@ -45,7 +48,7 @@ func InitZkTService() {
 			id = endpoint
 		}
 
-		var conn, err = ZkConn(id, endpoint)
+		var watcher, err = zookeeper.ZooWatcherGet(id, endpoint)
 		if err != nil {
 			_ = message.Error(404, err.Error())
 			return
@@ -53,8 +56,9 @@ func InitZkTService() {
 		if depth < 0 {
 			depth = 0
 		}
+		var conn = watcher.GetConn()
 		var builder strings.Builder
-		_ = ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
+		_ = zookeeper.ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
 			if len(filter) > 0 && !strings.Contains(current, filter) {
 				return true
 			}
@@ -73,7 +77,8 @@ func InitZkTService() {
 	var watches = map[string]<-chan zk.Event{}
 	_ = overseer.ServiceRegister("qam.zk.watch", nil, func(message *core.Message) {
 		var _, id, endpoint, path = getParams(message)
-		var conn, _ = ZkConn(id, endpoint)
+		var watcher, _ = zookeeper.ZooWatcherGet(id, endpoint)
+		var conn = watcher.GetConn()
 		var key = id + "@" + path
 
 		if watches[key] != nil {
@@ -82,16 +87,19 @@ func InitZkTService() {
 		}
 
 		var _, _, ch, err = conn.ChildrenW(path)
+
 		if err != nil {
 			_ = message.Error(500, err.Error())
 			return
 		}
-		mutex.Lock()
 		watches[key] = ch
-		mutex.Unlock()
 
 		go func() {
-			for event := range ch {
+			for {
+				var event, ok = <-ch
+				if !ok {
+					break
+				}
 				var stype = ""
 				var serror = ""
 				switch event.Type {
