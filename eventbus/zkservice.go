@@ -56,6 +56,7 @@ func InitZkTService() {
 		if depth < 0 {
 			depth = 0
 		}
+		watcher.WaitForConnected()
 		var conn = watcher.GetConn()
 		var builder strings.Builder
 		_ = zookeeper.ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
