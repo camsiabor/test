@@ -1,4 +1,4 @@
-package main
+package eventbus
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ var localOverseer *core.Overseer
 var clusterGateway core.Gateway
 var clusterOverseer *core.Overseer
 
-func initService() {
+func InitService() {
 	initLocalService()
 	initClusterService()
 }
@@ -77,4 +77,18 @@ func initClusterService() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetGateway(local bool) core.Gateway {
+	if local {
+		return localGateway
+	}
+	return clusterGateway
+}
+
+func GetOverseer(local bool) *core.Overseer {
+	if local {
+		return localOverseer
+	}
+	return clusterOverseer
 }

@@ -1,4 +1,4 @@
-package main
+package zkt
 
 import (
 	"github.com/samuel/go-zookeeper/zk"

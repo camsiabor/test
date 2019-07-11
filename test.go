@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"github.com/camsiabor/test/eventbus"
+	"github.com/camsiabor/test/httpt"
 	"time"
 )
 
 func main() {
 
-	initWeb()
+	httpt.InitWeb()
 
-	initService()
+	eventbus.InitService()
 
 	go func() {
 		for {

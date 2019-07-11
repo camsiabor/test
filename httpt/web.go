@@ -1,4 +1,4 @@
-package main
+package httpt
 
 import (
 	"encoding/json"
@@ -7,6 +7,8 @@ import (
 	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
+	"github.com/camsiabor/test/eventbus"
+	"github.com/camsiabor/test/zkt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/samuel/go-zookeeper/zk"
@@ -37,7 +39,7 @@ func QRecoveryWithWriter(f func(c *gin.Context, err interface{})) gin.HandlerFun
 	}
 }
 
-func initWeb() {
+func InitWeb() {
 
 	gin.SetMode("release")
 
@@ -166,11 +168,7 @@ func call(address string, data interface{}, timeout int64, local bool) (interfac
 	var request = core.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	var err error
 	var response *core.Message
-	if local {
-		response, err = localOverseer.Post(request)
-	} else {
-		response, err = clusterOverseer.Post(request)
-	}
+	response, err = eventbus.GetOverseer(local).Post(request)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +205,7 @@ func zkiter(context *gin.Context) {
 		id = endpoint
 	}
 
-	var conn, err = ZkConn(id, endpoint)
+	var conn, err = zkt.ZkConn(id, endpoint)
 	if err != nil {
 		context.String(500, qref.StackStringErr(err, 0))
 		return
@@ -216,7 +214,7 @@ func zkiter(context *gin.Context) {
 		depth = 0
 	}
 	var builder strings.Builder
-	_ = ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
+	_ = zkt.ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
 		builder.WriteString("\n")
 		builder.WriteString(current)
 		var _, stat, err = conn.Get(current)
@@ -235,7 +233,7 @@ func zkcreate(context *gin.Context) {
 	var data = context.Query("data")
 	var ephemeral, _ = strconv.Atoi(context.Query("ephe"))
 	var sequential, _ = strconv.Atoi(context.Query("seq"))
-	var conn, _ = ZkConn(id, "")
+	var conn, _ = zkt.ZkConn(id, "")
 
 	if conn == nil {
 		context.String(500, "id not found "+id)
