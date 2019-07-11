@@ -5,6 +5,7 @@ import (
 	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/zookeeper"
+	"strings"
 )
 
 var localGateway core.Gateway
@@ -62,7 +63,9 @@ func initClusterService() {
 		"session.timeout": 10,
 	}
 	if err := clusterGateway.Start(zkconfig); err != nil {
-		panic(err)
+		if !strings.Contains(err.Error(), "connect") {
+			panic(err)
+		}
 	}
 
 	err := clusterOverseer.ServiceRegister("qam.echo", nil, func(message *core.Message) {
