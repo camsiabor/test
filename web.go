@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qlog"
 	"github.com/camsiabor/qcom/qref"
+	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
 	"github.com/gin-gonic/gin"
 	"github.com/samuel/go-zookeeper/zk"
@@ -74,6 +75,7 @@ func call(context *gin.Context) {
 	var data = context.Query("data")
 	var address = context.Query("address")
 	var timeout = context.Query("timeout")
+	var local = util.AsBool(context.Query("local"), false)
 
 	var request = core.NewMessage(address, data, time.Duration(15)*time.Second)
 
@@ -86,7 +88,13 @@ func call(context *gin.Context) {
 		request.Timeout = time.Duration(itimeout) * time.Second
 	}
 
-	var response, err = overseer.Post(request)
+	var err error
+	var response *core.Message
+	if local {
+		response, err = localOverseer.Post(request)
+	} else {
+		response, err = clusterOverseer.Post(request)
+	}
 
 	if err != nil {
 		var reply = fmt.Sprintf("%v", err)
