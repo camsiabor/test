@@ -243,6 +243,11 @@ let methods = {
       target.consume = packet.consume;
 
       let r = target.response.result = target.response.result || target.response.error;
+
+      if (!r) {
+        r = target.response = { result : packet };
+      }
+
       if (r && typeof r === 'string') {
         r = r.trim();
         if (r.charAt(0) === '{' || r.charAt(0) === '[') {
@@ -256,7 +261,7 @@ let methods = {
         }
       }
 
-      if (typeof r.result === 'string') {
+      if (r.result && typeof r.result === 'string') {
         r.result = r.result.trim();
         if (r.result.charAt(0) === '{' || r.result.charAt(0) === '[') {
           try {
@@ -274,7 +279,7 @@ let methods = {
     }
 
     console.log('[response] ', id, packet);
-    this.handle_game_response(this.request[id], packet);
+    // this.handle_game_response(this.request[id], packet);
     this.$forceUpdate();
   },
 

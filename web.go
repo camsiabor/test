@@ -7,8 +7,10 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/samuel/go-zookeeper/zk"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -69,6 +71,43 @@ func initRoute(engine *gin.Engine) {
 	engine.GET("/zk/put", zkiter)
 	engine.GET("/zk/get", zkiter)
 
+	var root = "../src/github.com/camsiabor/test/web"
+	root, _ = filepath.Abs(root)
+
+	engine.Static("/js", root+"/js")
+	engine.Static("/css", root+"/css")
+	engine.Static("/img", root+"/img")
+	engine.Static("/res", root+"/res")
+	engine.Static("/svg", root+"/svg")
+	engine.Static("/tmp", root+"/tmp")
+	engine.Static("/h", root+"/")
+
+	engine.GET("/ws", wsconnect)
+}
+
+var upgrader = websocket.Upgrader{}
+
+func wsconnect(context *gin.Context) {
+	var conn, err = upgrader.Upgrade(context.Writer, context.Request, nil)
+	if err != nil {
+		context.String(500, qref.StackStringErr(err, 0))
+		return
+	}
+	go wsread(conn)
+}
+
+func wsread(conn *websocket.Conn) {
+	defer conn.Close()
+	for {
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		err = conn.WriteMessage(messageType, message)
+		if err != nil {
+			break
+		}
+	}
 }
 
 func call(context *gin.Context) {
