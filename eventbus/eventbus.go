@@ -14,7 +14,7 @@ var localOverseer *core.Overseer
 var clusterGateway core.Gateway
 var clusterOverseer *core.Overseer
 
-func InitService() {
+func InitEventBus() {
 	initLocalService()
 	initClusterService()
 }

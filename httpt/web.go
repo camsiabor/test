@@ -39,7 +39,7 @@ func QRecoveryWithWriter(f func(c *gin.Context, err interface{})) gin.HandlerFun
 	}
 }
 
-func InitWeb() {
+func InitWeb(address string) {
 
 	gin.SetMode("release")
 
@@ -54,7 +54,7 @@ func InitWeb() {
 
 	go func() {
 		var server = &http.Server{
-			Addr:    ":5555",
+			Addr:    address,
 			Handler: engine,
 		}
 		if err := server.ListenAndServe(); err != nil {
@@ -157,6 +157,10 @@ func wshandle(data []byte) (err error, ret []byte) {
 			var local = util.GetBool(request, false, "local")
 			result, err = call(address, params, timeout, local)
 		}
+	}
+	if err != nil {
+		code = 500
+		result = err.Error()
 	}
 	var end = time.Now().UnixNano()
 	consume = (end - start) / 1000 / 1000

@@ -2,12 +2,17 @@ package zkt
 
 import (
 	"github.com/samuel/go-zookeeper/zk"
+	"sync"
 	"time"
 )
 
+var mutex sync.RWMutex
 var zkconns = map[string]*zk.Conn{}
 
 func ZkConn(id string, endpoint string) (*zk.Conn, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	var err error
 	var conn = zkconns[id]
 	if conn == nil {
@@ -23,6 +28,17 @@ func ZkConn(id string, endpoint string) (*zk.Conn, error) {
 		zkconns[id] = conn
 	}
 	return conn, nil
+}
+
+func ZkClose(id string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	var conn = zkconns[id]
+	if conn != nil {
+		conn.Close()
+		delete(zkconns, id)
+	}
 }
 
 type ZkIterator func(conn *zk.Conn, current string, parent string, root string, depth int) bool

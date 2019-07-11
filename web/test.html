@@ -71,9 +71,9 @@
             @hit="select"
           >
             <template slot="append">
-              <button type="button" class="btn btn-outline-info" @click="deploy" v-if="type() === TEST">deploy</button>
               <button type="button" class="btn btn-outline-info" @click="exec" v-if="type() === TEST">exec</button>
-              <button type="button" class="btn btn-outline-info" @click="call">call</button>
+              <button type="button" class="btn btn-outline-info" v-on:click="call({'local':true})">local</button>
+              <button type="button" class="btn btn-outline-info" v-on:click="call()">cluster</button>
               <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only">Toggle Dropdown</span>
               </button>

@@ -454,7 +454,7 @@ let methods = {
     return this.config.call.script;
   },
 
-  call() {
+  call(extra) {
 
     let params = this.get_call_params();
     let method = this.config.call.method;
@@ -462,12 +462,20 @@ let methods = {
     this.record('call');
     this.config_save();
 
-    this.ws_send({
+    let packet = {
       action: 'call',
       method: method,
       params: params,
       timeout: (this.config.call.timeout || 60) * 1000
-    });
+    };
+
+    if (extra) {
+      for(let k in extra) {
+        packet[k] = extra[k]
+      }
+    }
+
+    this.ws_send(packet);
   },
 
   exec() {
