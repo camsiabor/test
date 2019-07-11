@@ -28,7 +28,7 @@ let config_def = {
       'oops': 'O_O!',
       'doc': 'click button call to invoke vertx.eventbus.send()'
     }, null, '  '),
-    script: '// click button exec to run groovy script; \n// click button deploy to deploy testing verticle \n return "hello world from groovy" + oops;',
+    script: '// click button exec to run lua script; \n return "hello world from lua" + oops;',
     timeout: 30,
     method_map: {},
     method_list: [],
@@ -635,7 +635,7 @@ let methods = {
     }
     if (!this.editor_script) {
       this.editor_script = ace.edit('editor_script', {
-        mode: 'ace/mode/groovy',
+        mode: 'ace/mode/lua',
         selectionStyle: 'text',
         highlightActiveLine: true,
         highlightSelectedWord: true,

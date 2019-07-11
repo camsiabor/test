@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/camsiabor/qcom/qlog"
 	"github.com/camsiabor/qcom/qref"
@@ -63,7 +64,7 @@ func initWeb() {
 
 func initRoute(engine *gin.Engine) {
 
-	engine.GET("/call", call)
+	engine.GET("/call", callp)
 
 	engine.GET("/zk/iter", zkiter)
 	engine.GET("/zk/create", zkcreate)
@@ -99,34 +100,70 @@ func wsconnect(context *gin.Context) {
 func wsread(conn *websocket.Conn) {
 	defer conn.Close()
 	for {
-		messageType, message, err := conn.ReadMessage()
+		messageType, data, err := conn.ReadMessage()
 		if err != nil {
 			break
 		}
-		err = conn.WriteMessage(messageType, message)
+		err, data = wshandle(data)
+		err = conn.WriteMessage(messageType, data)
 		if err != nil {
 			break
 		}
 	}
 }
 
-func call(context *gin.Context) {
-	var data = context.Query("data")
-	var address = context.Query("address")
-	var timeout = context.Query("timeout")
-	var local = util.AsBool(context.Query("local"), false)
+func wshandle(data []byte) (err error, ret []byte) {
+	var code = 404
+	var consume int64
+	var result interface{} = "handler not found"
+	var response = map[string]interface{}{}
 
-	var request = core.NewMessage(address, data, time.Duration(15)*time.Second)
+	defer func() {
 
-	if len(timeout) > 0 {
-		var itimeout, err = strconv.ParseInt(timeout, 10, 64)
-		if err != nil {
-			context.String(500, fmt.Sprintf("%v", err))
-			return
+		var pan = recover()
+		if pan == nil {
+			err = util.AsError(pan)
 		}
-		request.Timeout = time.Duration(itimeout) * time.Second
-	}
+		if err != nil {
+			result = qref.StackStringErr(err, 0)
+		}
+		response["code"] = code
+		response["result"] = result
+		response["consume"] = consume
 
+		ret, err = json.Marshal(response)
+		if err != nil {
+			response["result"] = "marshal response result fail : " + err.Error()
+			ret, _ = json.Marshal(response)
+		}
+
+	}()
+
+	var request map[string]interface{}
+	err = json.Unmarshal(data, &request)
+
+	var start = time.Now().UnixNano()
+	var id = util.GetInt64(request, 0, "id")
+	response["id"] = id
+	if err == nil {
+		var action = util.GetStr(request, "", "action")
+		if action == "call" {
+			code = 200
+			var address = util.GetStr(request, "", "method")
+			var params = util.GetMap(request, false, "params")
+			var timeout = util.GetInt64(request, 15000, "timeout")
+			var local = util.GetBool(request, false, "local")
+			result, err = call(address, params, timeout, local)
+		}
+	}
+	var end = time.Now().UnixNano()
+	consume = (end - start) / 1000 / 1000
+	return
+}
+
+func call(address string, data interface{}, timeout int64, local bool) (interface{}, error) {
+
+	var request = core.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	var err error
 	var response *core.Message
 	if local {
@@ -134,20 +171,28 @@ func call(context *gin.Context) {
 	} else {
 		response, err = clusterOverseer.Post(request)
 	}
+	if err != nil {
+		return nil, err
+	}
+	if response.IsError() {
+		return nil, fmt.Errorf("%v", response.ReplyErr)
+	}
+	return response.ReplyData, nil
+}
 
+func callp(context *gin.Context) {
+	var data = context.Query("data")
+	var address = context.Query("address")
+	var timeout = util.AsInt64(context.Query("timeout"), 15000)
+	var local = util.AsBool(context.Query("local"), false)
+
+	var ret, err = call(address, data, timeout, local)
 	if err != nil {
 		var reply = fmt.Sprintf("%v", err)
 		context.String(500, reply)
 		return
 	}
-
-	if response.IsError() {
-		var reply = fmt.Sprintf("%v", response.ReplyErr)
-		context.String(500, reply)
-		return
-	}
-
-	var reply = fmt.Sprintf("%v", response.ReplyData)
+	var reply = fmt.Sprintf("%v", ret)
 	context.String(200, reply)
 
 }

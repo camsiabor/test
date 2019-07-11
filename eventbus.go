@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/zookeeper"
-	"strings"
 	"time"
 )
 
@@ -39,9 +37,7 @@ func initLocalService() {
 
 	err := localOverseer.ServiceRegister("qam.echo", nil, func(message *core.Message) {
 		_, _ = fmt.Printf("local echo %v\n", message.Data)
-		var reply = util.AsStr(message.Data, "")
-		reply = "local." + strings.ToUpper(reply)
-		_ = message.Reply(0, reply)
+		_ = message.Reply(0, message.Data)
 	})
 
 	if err != nil {
@@ -75,9 +71,7 @@ func initClusterService() {
 
 	err := clusterOverseer.ServiceRegister("qam.echo", nil, func(message *core.Message) {
 		_, _ = fmt.Printf("cluster echo %v\n", message.Data)
-		var reply = util.AsStr(message.Data, "")
-		reply = "cluster." + strings.ToLower(reply)
-		_ = message.Reply(0, reply)
+		_ = message.Reply(0, message.Data)
 	})
 
 	if err != nil {
