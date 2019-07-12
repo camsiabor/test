@@ -2,11 +2,12 @@ package eventbus
 
 import (
 	"fmt"
+	"github.com/camsiabor/go-zookeeper/zk"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/zookeeper"
-	"github.com/samuel/go-zookeeper/zk"
 	"strings"
+	"time"
 )
 
 func getParams(message *core.Message) (request map[string]interface{}, id string, endpoint string, path string) {
@@ -43,7 +44,7 @@ func InitZkTService() {
 		var request, id, endpoint, path = getParams(message)
 		var depth = util.GetInt(request, 0, "depth")
 		var filter = util.GetStr(request, "", "filter")
-
+		var timeout = util.GetInt64(request, 5, "timeout")
 		if len(id) == 0 {
 			id = endpoint
 		}
@@ -56,7 +57,20 @@ func InitZkTService() {
 		if depth < 0 {
 			depth = 0
 		}
-		watcher.WaitForConnected()
+		var connectChannel = watcher.WaitForConnected()
+		if connectChannel != nil {
+			var chosen, connected, recvok = util.Timeout(connectChannel, time.Duration(timeout)*time.Second)
+			if chosen < 0 {
+				_ = message.Error(300, "connect to zookeeper timeout : "+id)
+				_ = watcher.Stop(nil)
+				return
+			}
+			if !connected.Bool() || !recvok {
+				_ = message.Error(500, "instance closed : "+id)
+
+				return
+			}
+		}
 		var conn = watcher.GetConn()
 		var builder strings.Builder
 		_ = zookeeper.ZkIterate(conn, path, path, depth, func(conn *zk.Conn, current string, parent string, root string, depth int) bool {
