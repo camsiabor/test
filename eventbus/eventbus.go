@@ -2,17 +2,17 @@ package eventbus
 
 import (
 	"fmt"
-	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/zookeeper"
+	"github.com/camsiabor/qservice/qtiny"
 	"strings"
 )
 
-var localGateway core.Gateway
-var localOverseer *core.Overseer
+var localGateway qtiny.Gateway
+var localOverseer *qtiny.Overseer
 
-var clusterGateway core.Gateway
-var clusterOverseer *core.Overseer
+var clusterGateway qtiny.Gateway
+var clusterOverseer *qtiny.Overseer
 
 func InitEventBus() {
 	initLocalService()
@@ -22,7 +22,7 @@ func InitEventBus() {
 func initLocalService() {
 
 	localGateway = &memory.MGateway{}
-	localOverseer = &core.Overseer{}
+	localOverseer = &qtiny.Overseer{}
 
 	fmt.Println("[service] local initiating")
 
@@ -36,7 +36,7 @@ func initLocalService() {
 		panic(err)
 	}
 
-	err := localOverseer.ServiceRegister("qam.echo", nil, func(message *core.Message) {
+	err := localOverseer.ServiceRegister("qam.echo", nil, func(message *qtiny.Message) {
 		_, _ = fmt.Printf("local echo %v\n", message.Data)
 		_ = message.Reply(0, message.Data)
 	})
@@ -49,7 +49,7 @@ func initLocalService() {
 func initClusterService() {
 
 	clusterGateway = &zookeeper.ZGateway{}
-	clusterOverseer = &core.Overseer{}
+	clusterOverseer = &qtiny.Overseer{}
 
 	fmt.Println("[service] cluster initiating")
 
@@ -68,7 +68,7 @@ func initClusterService() {
 		}
 	}
 
-	err := clusterOverseer.ServiceRegister("qam.echo", nil, func(message *core.Message) {
+	err := clusterOverseer.ServiceRegister("qam.echo", nil, func(message *qtiny.Message) {
 		_, _ = fmt.Printf("cluster echo %v\n", message.Data)
 		_ = message.Reply(0, message.Data)
 	})
@@ -78,14 +78,14 @@ func initClusterService() {
 	}
 }
 
-func GetGateway(local bool) core.Gateway {
+func GetGateway(local bool) qtiny.Gateway {
 	if local {
 		return localGateway
 	}
 	return clusterGateway
 }
 
-func GetOverseer(local bool) *core.Overseer {
+func GetOverseer(local bool) *qtiny.Overseer {
 	if local {
 		return localOverseer
 	}

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/camsiabor/go-zookeeper/zk"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/qservice/core"
 	"github.com/camsiabor/qservice/impl/zookeeper"
+	"github.com/camsiabor/qservice/qtiny"
 	"strings"
 	"time"
 )
 
-func getParams(message *core.Message) (request map[string]interface{}, id string, endpoint string, path string) {
+func getParams(message *qtiny.Message) (request map[string]interface{}, id string, endpoint string, path string) {
 	request = util.AsMap(message.Data, false)
 	id = util.GetStr(request, "", "id")
 	endpoint = util.GetStr(request, "127.0.0.1:2181", "endpoint")
@@ -21,7 +21,7 @@ func getParams(message *core.Message) (request map[string]interface{}, id string
 func InitZkTService() {
 	var overseer = GetOverseer(true)
 
-	_ = overseer.ServiceRegister("qam.zk.conn", nil, func(message *core.Message) {
+	_ = overseer.ServiceRegister("qam.zk.conn", nil, func(message *qtiny.Message) {
 		var _, id, endpoint, _ = getParams(message)
 		var _, err = zookeeper.ZooWatcherGet(id, endpoint)
 		if err == nil {
@@ -31,7 +31,7 @@ func InitZkTService() {
 		}
 	})
 
-	_ = overseer.ServiceRegister("qam.zk.close", nil, func(message *core.Message) {
+	_ = overseer.ServiceRegister("qam.zk.close", nil, func(message *qtiny.Message) {
 		var _, id, _, _ = getParams(message)
 		var watcher, _ = zookeeper.ZooWatcherGet(id, "")
 		if watcher != nil {
@@ -40,7 +40,7 @@ func InitZkTService() {
 		_ = message.Reply(0, id+" closed")
 	})
 
-	_ = overseer.ServiceRegister("qam.zk.iter", nil, func(message *core.Message) {
+	_ = overseer.ServiceRegister("qam.zk.iter", nil, func(message *qtiny.Message) {
 		var request, id, endpoint, path = getParams(message)
 		var depth = util.GetInt(request, 0, "depth")
 		var filter = util.GetStr(request, "", "filter")
@@ -62,12 +62,12 @@ func InitZkTService() {
 			var chosen, connected, recvok = util.Timeout(connectChannel, time.Duration(timeout)*time.Second)
 			if chosen < 0 {
 				_ = message.Error(300, "connect to zookeeper timeout : "+id)
-				_ = watcher.Stop(nil)
+				zookeeper.ZooWatcherClose(id)
 				return
 			}
 			if !connected.Bool() || !recvok {
 				_ = message.Error(500, "instance closed : "+id)
-
+				zookeeper.ZooWatcherClose(id)
 				return
 			}
 		}
@@ -90,7 +90,7 @@ func InitZkTService() {
 	})
 
 	var watches = map[string]<-chan zk.Event{}
-	_ = overseer.ServiceRegister("qam.zk.watch", nil, func(message *core.Message) {
+	_ = overseer.ServiceRegister("qam.zk.watch", nil, func(message *qtiny.Message) {
 		var _, id, endpoint, path = getParams(message)
 		var watcher, _ = zookeeper.ZooWatcherGet(id, endpoint)
 		var conn = watcher.GetConn()

@@ -6,7 +6,7 @@ import (
 	"github.com/camsiabor/qcom/qlog"
 	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/qservice/core"
+	"github.com/camsiabor/qservice/qtiny"
 	"github.com/camsiabor/test/eventbus"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -159,9 +159,9 @@ func wshandle(data []byte) (err error, ret []byte) {
 
 func call(address string, data interface{}, timeout int64, local bool) (interface{}, error) {
 
-	var request = core.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
+	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	var err error
-	var response *core.Message
+	var response *qtiny.Message
 	response, err = eventbus.GetOverseer(local).Post(request)
 	if err != nil {
 		return nil, err
