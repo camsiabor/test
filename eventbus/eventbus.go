@@ -26,13 +26,13 @@ func initLocalService() {
 
 	fmt.Println("[service] local initiating")
 
-	var overconfig = map[string]interface{}{"gateway": localGateway}
-	if err := localOverseer.Start(overconfig); err != nil {
+	var memconfig = map[string]interface{}{}
+	if err := localGateway.Start(memconfig); err != nil {
 		panic(err)
 	}
 
-	var memconfig = map[string]interface{}{}
-	if err := localGateway.Start(memconfig); err != nil {
+	var overconfig = map[string]interface{}{"gateway": localGateway}
+	if err := localOverseer.Start(overconfig); err != nil {
 		panic(err)
 	}
 
@@ -53,11 +53,6 @@ func initClusterService() {
 
 	fmt.Println("[service] cluster initiating")
 
-	var overconfig = map[string]interface{}{"gateway": clusterGateway}
-	if err := clusterOverseer.Start(overconfig); err != nil {
-		panic(err)
-	}
-
 	var zkconfig = map[string]interface{}{
 		"endpoints":       []string{"127.0.0.1:12181"},
 		"session.timeout": 10,
@@ -66,6 +61,11 @@ func initClusterService() {
 		if !strings.Contains(err.Error(), "connect") {
 			panic(err)
 		}
+	}
+
+	var overconfig = map[string]interface{}{"gateway": clusterGateway}
+	if err := clusterOverseer.Start(overconfig); err != nil {
+		panic(err)
 	}
 
 	err := clusterOverseer.ServiceRegister("qam.echo", nil, func(message *qtiny.Message) {
