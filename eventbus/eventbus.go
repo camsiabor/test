@@ -54,6 +54,7 @@ func initClusterService() {
 	fmt.Println("[service] cluster initiating")
 
 	var zkconfig = map[string]interface{}{
+		"id":              "cluster",
 		"endpoints":       []string{"127.0.0.1:12181"},
 		"session.timeout": 10,
 	}
