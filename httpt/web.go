@@ -35,16 +35,17 @@ func QRecoveryWithWriter(f func(c *gin.Context, err interface{})) gin.HandlerFun
 	}
 }
 
-func InitWeb(address string) {
+func InitWeb(config map[string]interface{}) {
+
+	var address = util.GetStr(config, ":5555", "endpoint")
 
 	gin.SetMode("release")
 
 	var engine = gin.Default()
 
-	initRoute(engine)
+	initRoute(engine, config)
 
 	engine.Use(QRecovery(func(c *gin.Context, err interface{}) {
-
 		c.String(500, qref.StackStringErr(err, 0))
 	}))
 
@@ -60,11 +61,11 @@ func InitWeb(address string) {
 
 }
 
-func initRoute(engine *gin.Engine) {
+func initRoute(engine *gin.Engine, config map[string]interface{}) {
 
 	engine.GET("/call", callp)
 
-	var root = "../src/github.com/camsiabor/test/web"
+	var root = util.GetStr(config, "../../src/github.com/camsiabor/test/web", "root")
 	root, _ = filepath.Abs(root)
 
 	engine.Static("/js", root+"/js")

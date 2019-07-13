@@ -2,6 +2,7 @@ package eventbus
 
 import (
 	"fmt"
+	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
@@ -14,25 +15,26 @@ var localOverseer *qtiny.Overseer
 var clusterGateway qtiny.Gateway
 var clusterOverseer *qtiny.Overseer
 
-func InitEventBus() {
-	initLocalService()
-	initClusterService()
+func InitEventBus(config map[string]interface{}) {
+	var localConfig = util.GetMap(config, true, "local")
+	var clusterConfig = util.GetMap(config, true, "cluster")
+	initLocalService(localConfig)
+	initClusterService(clusterConfig)
 }
 
-func initLocalService() {
+func initLocalService(config map[string]interface{}) {
 
 	localGateway = &memory.MGateway{}
 	localOverseer = &qtiny.Overseer{}
 
 	fmt.Println("[service] local initiating")
 
-	var memconfig = map[string]interface{}{}
-	if err := localGateway.Start(memconfig); err != nil {
+	if err := localGateway.Start(config); err != nil {
 		panic(err)
 	}
 
-	var overconfig = map[string]interface{}{"gateway": localGateway}
-	if err := localOverseer.Start(overconfig); err != nil {
+	localOverseer.SetGateway(localGateway)
+	if err := localOverseer.Start(config); err != nil {
 		panic(err)
 	}
 
@@ -46,37 +48,33 @@ func initLocalService() {
 	}
 }
 
-func initClusterService() {
+func initClusterService(config map[string]interface{}) {
 
 	clusterGateway = &zookeeper.ZGateway{}
 	clusterOverseer = &qtiny.Overseer{}
 
 	fmt.Println("[service] cluster initiating")
 
-	var zkconfig = map[string]interface{}{
-		"id":              "cluster",
-		"endpoints":       []string{"127.0.0.1:12181"},
-		"session.timeout": 10,
-	}
-	if err := clusterGateway.Start(zkconfig); err != nil {
+	if err := clusterGateway.Start(config); err != nil {
 		if !strings.Contains(err.Error(), "connect") {
 			panic(err)
 		}
 	}
 
-	var overconfig = map[string]interface{}{"gateway": clusterGateway}
-	if err := clusterOverseer.Start(overconfig); err != nil {
+	clusterOverseer.SetGateway(clusterGateway)
+	if err := clusterOverseer.Start(config); err != nil {
 		panic(err)
 	}
 
-	err := clusterOverseer.ServiceRegister("qam.echo", nil, func(message *qtiny.Message) {
+	_ = clusterOverseer.ServiceRegister("qam.echo", nil, func(message *qtiny.Message) {
 		_, _ = fmt.Printf("cluster echo %v\n", message.Data)
 		_ = message.Reply(0, message.Data)
 	})
 
-	if err != nil {
-		panic(err)
-	}
+	_ = clusterOverseer.ServiceRegister("qam.ping", nil, func(message *qtiny.Message) {
+		_ = message.Reply(0, "pong "+clusterOverseer.GetGateway().GetId())
+	})
+
 }
 
 func GetGateway(local bool) qtiny.Gateway {
