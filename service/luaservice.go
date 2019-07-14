@@ -11,7 +11,7 @@ import (
 )
 
 func InitLuaService(config map[string]interface{}) {
-	var overseer = eventbus.GetOverseer(true)
+	var overseer = eventbus.GetOverseer(false)
 
 	var luaPath = util.GetStr(config, "../../src/github.com/camsiabor/test/lua/", "lua", "path")
 	var luaCPath = util.GetStr(config, luaPath, "lua", "cpath")

@@ -25,7 +25,7 @@ func main() {
 
 	var eventbusConfig = util.GetMap(config, true, "eventbus")
 	eventbus.InitEventBus(eventbusConfig)
-	//service.InitZkTService()
+	service.InitZkTService()
 	service.InitLuaService(config)
 
 	var httpConfig = util.GetMap(config, true, "http")
