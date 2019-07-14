@@ -43,7 +43,7 @@ func InitZkTService() {
 
 	_ = overseer.ServiceRegister("qam.zk.iter", nil, func(message *qtiny.Message) {
 		var request, id, endpoint, path = getParams(message)
-		var depth = util.GetInt(request, 0, "depth")
+		var depth = util.GetInt(request, 3, "depth")
 		var filter = util.GetStr(request, "", "filter")
 		var timeout = util.GetInt64(request, 5, "timeout")
 		if len(id) == 0 {

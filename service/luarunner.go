@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func InitState(luaPath, luaCPath string) (L *lua.State, err error) {
+func InitLuaState(luaPath, luaCPath string) (L *lua.State, err error) {
 
 	defer func() {
 		var pan = recover()
@@ -60,7 +60,7 @@ func DefaultErrHandler(L *lua.State, pan interface{}) {
 	}
 }
 
-func RunFile(L *lua.State, filename string, errhandler lua.LuaGoErrHandler) (rets []interface{}, err error) {
+func RunLuaFile(L *lua.State, filename string, errhandler lua.LuaGoErrHandler) (rets []interface{}, err error) {
 
 	var fpath = filename
 	L.GetGlobal(luar.LUA_PATH_ABS)
