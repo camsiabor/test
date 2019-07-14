@@ -1,5 +1,6 @@
 print('hello lua!!!')
 
-ServiceRegister("power", nil, function()
+ServiceRegister("qam.lua.test", nil, function(msg)
     print("i am call!")
+    Reply(msg, 0, "power overwhelming")
 end)

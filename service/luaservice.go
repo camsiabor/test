@@ -7,6 +7,7 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/camsiabor/test/eventbus"
+	"unsafe"
 )
 
 func InitLuaService(config map[string]interface{}) {
@@ -23,6 +24,22 @@ func InitLuaService(config map[string]interface{}) {
 		"overseer": overseer,
 	})
 
+	L.Register("Reply", func(L *lua.State) int {
+
+		var ptrvalue = L.ToInteger(1)
+		var ptr = unsafe.Pointer(uintptr(ptrvalue))
+		var message = (*qtiny.Message)(ptr)
+		var code = L.ToInteger(2)
+		var reply = L.ToString(3)
+		var err = message.Reply(code, reply)
+		if err == nil {
+			L.PushNil()
+		} else {
+			L.PushString(err.Error())
+		}
+		return 1
+	})
+
 	L.Register("ServiceRegister", func(L *lua.State) int {
 		var address = L.ToString(1)
 		fmt.Println(address)
@@ -31,11 +48,10 @@ func InitLuaService(config map[string]interface{}) {
 		var ref = L.Ref(lua.LUA_REGISTRYINDEX)
 
 		var err = overseer.ServiceRegister(address, nil, func(message *qtiny.Message) {
-			var pointer interface{} = message
+			var ptrvalue = uintptr(unsafe.Pointer(message))
 			L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
-			L.PushLightUserdata(&pointer)
-
-			L.Call(2, 0)
+			L.PushInteger(int64(ptrvalue))
+			L.Call(1, 0)
 		})
 
 		if err == nil {
