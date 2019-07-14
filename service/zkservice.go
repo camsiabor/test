@@ -1,4 +1,4 @@
-package eventbus
+package service
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
+	"github.com/camsiabor/test/eventbus"
 	"strings"
 	"time"
 )
@@ -19,7 +20,7 @@ func getParams(message *qtiny.Message) (request map[string]interface{}, id strin
 }
 
 func InitZkTService() {
-	var overseer = GetOverseer(true)
+	var overseer = eventbus.GetOverseer(true)
 
 	_ = overseer.ServiceRegister("qam.zk.conn", nil, func(message *qtiny.Message) {
 		var _, id, endpoint, _ = getParams(message)
