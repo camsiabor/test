@@ -114,7 +114,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 	defer func() {
 
 		var pan = recover()
-		if pan == nil {
+		if pan != nil {
 			err = util.AsError(pan)
 		}
 		if err != nil {
