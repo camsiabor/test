@@ -86,7 +86,7 @@ func RunFile(L *lua.State, filename string, errhandler lua.LuaGoErrHandler) (ret
 		if return_num > 0 {
 			rets = make([]interface{}, return_num)
 			for i := 0; i < return_num; i++ {
-				rets[i], err = GetVal(L, i+1)
+				rets[i], err = luar.GetVal(L, i+1)
 				if err != nil {
 					break
 				}
