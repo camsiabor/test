@@ -6,6 +6,7 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/test/eventbus"
 	"github.com/camsiabor/test/httpt"
+	"github.com/camsiabor/test/service"
 	"os"
 	"time"
 )
@@ -24,7 +25,7 @@ func main() {
 
 	var eventbusConfig = util.GetMap(config, true, "eventbus")
 	eventbus.InitEventBus(eventbusConfig)
-	eventbus.InitZkTService()
+	service.InitZkTService()
 
 	var httpConfig = util.GetMap(config, true, "http")
 	httpt.InitWeb(httpConfig)
