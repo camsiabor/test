@@ -6,6 +6,8 @@ import (
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -29,6 +31,8 @@ func initLocalService(config map[string]interface{}) {
 
 	fmt.Println("[service] local initiating")
 
+	var logger = log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.LUTC)
+	localGateway.SetLogger(logger)
 	if err := localGateway.Start(config); err != nil {
 		panic(err)
 	}
@@ -55,6 +59,8 @@ func initClusterService(config map[string]interface{}) {
 
 	fmt.Println("[service] cluster initiating")
 
+	var logger = log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.LUTC)
+	clusterGateway.SetLogger(logger)
 	if err := clusterGateway.Start(config); err != nil {
 		if !strings.Contains(err.Error(), "connect") {
 			panic(err)
