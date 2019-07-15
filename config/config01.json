@@ -4,6 +4,9 @@
     "endpoint" : ":5555",
     "root" : "../../src/github.com/camsiabor/test/web"
   },
+  "lua" : {
+    "path" : "../../src/github.com/camsiabor/test/lua"
+  },
   "eventbus" : {
     "local" : {
 
@@ -11,7 +14,7 @@
     "cluster" : {
       "id" : "node01",
       "endpoints" : [ "127.0.0.1:12181" ],
-      "session.timeout" : 30
+      "session.timeout" : 10
     }
   }
 }
