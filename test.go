@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/test/gateway"
+	"github.com/camsiabor/qservice/impl/zookeeper"
+	"github.com/camsiabor/qservice/qtiny"
 	"github.com/camsiabor/test/httpt"
 	"github.com/camsiabor/test/service"
 	"os"
@@ -23,8 +24,11 @@ func main() {
 		panic(err)
 	}
 
-	var gatewayConfig = util.GetMap(config, true, "gateway")
-	gateway.InitGateway(gatewayConfig)
+	var tina = qtiny.GetTina()
+	tina.SetGateway(&zookeeper.ZGateway{})
+	tina.SetMicroroller(&qtiny.Microroller{})
+	tina.Start(config)
+
 	service.InitZkTService()
 	service.InitLuaService(config)
 

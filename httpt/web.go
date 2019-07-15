@@ -157,11 +157,11 @@ func wshandle(data []byte) (err error, ret []byte) {
 }
 
 func call(address string, data interface{}, timeout int64) (interface{}, error) {
-
+	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	var err error
 	var response *qtiny.Message
-	response, err = gateway.GetOverseer().Post(request)
+	response, err = tina.GetMicroroller().Post(request)
 	if err != nil {
 		return nil, err
 	}

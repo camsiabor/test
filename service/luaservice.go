@@ -6,12 +6,13 @@ import (
 	"github.com/camsiabor/golua/luar"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/qtiny"
-	"github.com/camsiabor/test/gateway"
+
 	"unsafe"
 )
 
 func InitLuaService(config map[string]interface{}) {
-	var microroller = gateway.GetMicroroller()
+	var tina = qtiny.GetTina()
+	var microroller = tina.GetMicroroller()
 
 	var luaPath = util.GetStr(config, "../../src/github.com/camsiabor/test/lua/", "lua", "path")
 	var luaCPath = util.GetStr(config, luaPath, "lua", "cpath")

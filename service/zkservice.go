@@ -6,7 +6,7 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
-	"github.com/camsiabor/test/gateway"
+
 	"strings"
 	"time"
 )
@@ -21,7 +21,9 @@ func getParams(message *qtiny.Message) (request map[string]interface{}, id strin
 
 func InitZkTService() {
 
-	var microroller = gateway.GetMicroroller()
+	var tina = qtiny.GetTina()
+
+	var microroller = tina.GetMicroroller()
 
 	_ = microroller.NanoLocalRegister("qam.echo", 0, nil, func(message *qtiny.Message) {
 		_, _ = fmt.Printf("cluster echo %v\n", message.Data)
