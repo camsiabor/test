@@ -144,7 +144,16 @@ func wshandle(data []byte) (err error, ret []byte) {
 			var address = util.GetStr(request, "", "method")
 			var params = util.GetMap(request, false, "params")
 			var timeout = util.GetInt64(request, 15000, "timeout")
-			result, err = call(address, params, timeout)
+			var local = util.GetBool(request, false, "local")
+			var remote = util.GetBool(request, false, "remote")
+			var flag qtiny.MessageFlag
+			if local {
+				flag = flag | qtiny.MessageFlagLocalOnly
+			}
+			if remote {
+				flag = flag | qtiny.MessageFlagRemoteOnly
+			}
+			result, err = call(address, params, timeout, flag)
 		}
 	}
 	if err != nil {
@@ -156,9 +165,11 @@ func wshandle(data []byte) (err error, ret []byte) {
 	return
 }
 
-func call(address string, data interface{}, timeout int64) (interface{}, error) {
+func call(address string, data interface{}, timeout int64, flag qtiny.MessageFlag) (interface{}, error) {
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
+	request.Flag = flag
+
 	var err error
 	var response *qtiny.Message
 	response, err = tina.GetMicroroller().Post(request)
@@ -175,8 +186,16 @@ func callp(context *gin.Context) {
 	var data = context.Query("data")
 	var address = context.Query("address")
 	var timeout = util.AsInt64(context.Query("timeout"), 15000)
-
-	var ret, err = call(address, data, timeout)
+	var local = util.AsBool(context.Query("local"), false)
+	var remote = util.AsBool(context.Query("remote"), false)
+	var flag qtiny.MessageFlag
+	if local {
+		flag = flag | qtiny.MessageFlagLocalOnly
+	}
+	if remote {
+		flag = flag | qtiny.MessageFlagRemoteOnly
+	}
+	var ret, err = call(address, data, timeout, flag)
 	if err != nil {
 		var reply = fmt.Sprintf("%v", err)
 		context.String(500, reply)
