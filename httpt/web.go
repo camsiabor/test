@@ -145,8 +145,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 			var address = util.GetStr(request, "", "method")
 			var params = util.GetMap(request, false, "params")
 			var timeout = util.GetInt64(request, 15000, "timeout")
-			var local = util.GetBool(request, false, "local")
-			result, err = call(address, params, timeout, local)
+			result, err = call(address, params, timeout)
 		}
 	}
 	if err != nil {
@@ -158,12 +157,12 @@ func wshandle(data []byte) (err error, ret []byte) {
 	return
 }
 
-func call(address string, data interface{}, timeout int64, local bool) (interface{}, error) {
+func call(address string, data interface{}, timeout int64) (interface{}, error) {
 
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	var err error
 	var response *qtiny.Message
-	response, err = eventbus.GetOverseer(local).Post(request)
+	response, err = eventbus.GetOverseer().Post(request)
 	if err != nil {
 		return nil, err
 	}
@@ -177,9 +176,8 @@ func callp(context *gin.Context) {
 	var data = context.Query("data")
 	var address = context.Query("address")
 	var timeout = util.AsInt64(context.Query("timeout"), 15000)
-	var local = util.AsBool(context.Query("local"), false)
 
-	var ret, err = call(address, data, timeout, local)
+	var ret, err = call(address, data, timeout)
 	if err != nil {
 		var reply = fmt.Sprintf("%v", err)
 		context.String(500, reply)

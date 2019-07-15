@@ -11,7 +11,7 @@ import (
 )
 
 func InitLuaService(config map[string]interface{}) {
-	var overseer = eventbus.GetOverseer(false)
+	var overseer = eventbus.GetOverseer()
 
 	var luaPath = util.GetStr(config, "../../src/github.com/camsiabor/test/lua/", "lua", "path")
 	var luaCPath = util.GetStr(config, luaPath, "lua", "cpath")
@@ -47,7 +47,7 @@ func InitLuaService(config map[string]interface{}) {
 
 		var ref = L.Ref(lua.LUA_REGISTRYINDEX)
 
-		var err = overseer.ServiceRegister(address, nil, func(message *qtiny.Message) {
+		var err = overseer.ServiceRegister(address, 0, nil, func(message *qtiny.Message) {
 			var ptrvalue = uintptr(unsafe.Pointer(message))
 			L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
 			L.PushInteger(int64(ptrvalue))
