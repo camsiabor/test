@@ -11,3 +11,6 @@ ServiceRegister("qam.lua.test2", nil, function(msg)
     print("i am call! 2")
     Reply(msg, 0, "test2 " .. id)
 end)
+
+
+

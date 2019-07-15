@@ -51,7 +51,10 @@ func InitLuaService(config map[string]interface{}) {
 			var ptrvalue = uintptr(unsafe.Pointer(message))
 			L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
 			L.PushInteger(int64(ptrvalue))
-			L.Call(1, 0)
+			L.CallHandle(1, 0, func(L *lua.State, pan interface{}) {
+				var err = util.AsError(pan)
+				message.Error(0, err.Error())
+			})
 		})
 
 		if err == nil {

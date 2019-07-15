@@ -80,8 +80,8 @@ func RunLuaFile(L *lua.State, filename string, errhandler lua.LuaGoErrHandler) (
 	}
 
 	err = L.CallHandle(0, lua.LUA_MULTRET, errhandler)
-	var top_after = L.GetTop()
-	var return_num = top_after - topBefore
+	var topAfter = L.GetTop()
+	var return_num = topAfter - topBefore
 	if err == nil {
 		if return_num > 0 {
 			rets = make([]interface{}, return_num)
@@ -93,8 +93,8 @@ func RunLuaFile(L *lua.State, filename string, errhandler lua.LuaGoErrHandler) (
 			}
 		}
 	}
-	top_after = L.GetTop()
-	if top_after-topBefore > 0 {
+	topAfter = L.GetTop()
+	if topAfter-topBefore > 0 {
 		for i := 0; i < return_num; i++ {
 			L.Pop(-1)
 		}
