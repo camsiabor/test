@@ -11,7 +11,7 @@ import (
 )
 
 var gateway qtiny.Gateway
-var overseer *qtiny.Overseer
+var overseer *qtiny.MicroRoller
 
 func InitEventBus(config map[string]interface{}) {
 	var clusterConfig = util.GetMap(config, true, "cluster")
@@ -21,13 +21,13 @@ func InitEventBus(config map[string]interface{}) {
 func initClusterService(config map[string]interface{}) {
 
 	gateway = &zookeeper.ZGateway{}
-	overseer = &qtiny.Overseer{}
+	overseer = &qtiny.MicroRoller{}
 
 	fmt.Println("[service] cluster initiating")
 
 	var logger = log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.LUTC)
 	gateway.SetLogger(logger)
-	if err := gateway.Start(config, nil); err != nil {
+	if err := gateway.Start(config); err != nil {
 		if !strings.Contains(err.Error(), "connect") {
 			panic(err)
 		}
@@ -53,6 +53,6 @@ func GetGateway() qtiny.Gateway {
 	return gateway
 }
 
-func GetOverseer() *qtiny.Overseer {
+func GetOverseer() *qtiny.MicroRoller {
 	return overseer
 }
