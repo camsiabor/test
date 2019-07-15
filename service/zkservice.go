@@ -22,7 +22,7 @@ func getParams(message *qtiny.Message) (request map[string]interface{}, id strin
 func InitZkTService() {
 	var overseer = eventbus.GetOverseer()
 
-	_ = overseer.ServiceRegister("qam.zk.conn", 0, nil, func(message *qtiny.Message) {
+	_ = overseer.NanoLocalRegister("qam.zk.conn", 0, nil, func(message *qtiny.Message) {
 		var _, id, endpoint, _ = getParams(message)
 		var _, err = zookeeper.ZooWatcherGet(id, endpoint)
 		if err == nil {
@@ -32,7 +32,7 @@ func InitZkTService() {
 		}
 	})
 
-	_ = overseer.ServiceRegister("qam.zk.close", 0, nil, func(message *qtiny.Message) {
+	_ = overseer.NanoLocalRegister("qam.zk.close", 0, nil, func(message *qtiny.Message) {
 		var _, id, _, _ = getParams(message)
 		var watcher, _ = zookeeper.ZooWatcherGet(id, "")
 		if watcher != nil {
@@ -41,7 +41,7 @@ func InitZkTService() {
 		_ = message.Reply(0, id+" closed")
 	})
 
-	_ = overseer.ServiceRegister("qam.zk.iter", 0, nil, func(message *qtiny.Message) {
+	_ = overseer.NanoLocalRegister("qam.zk.iter", 0, nil, func(message *qtiny.Message) {
 		var request, id, endpoint, path = getParams(message)
 		var depth = util.GetInt(request, 3, "depth")
 		var filter = util.GetStr(request, "", "filter")
@@ -91,7 +91,7 @@ func InitZkTService() {
 	})
 
 	var watches = map[string]<-chan zk.Event{}
-	_ = overseer.ServiceRegister("qam.zk.watch", 0, nil, func(message *qtiny.Message) {
+	_ = overseer.NanoLocalRegister("qam.zk.watch", 0, nil, func(message *qtiny.Message) {
 		var _, id, endpoint, path = getParams(message)
 		var watcher, _ = zookeeper.ZooWatcherGet(id, endpoint)
 		var conn = watcher.GetConn()

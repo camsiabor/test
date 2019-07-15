@@ -38,12 +38,12 @@ func initClusterService(config map[string]interface{}) {
 		panic(err)
 	}
 
-	_ = overseer.ServiceRegister("qam.echo", 0, nil, func(message *qtiny.Message) {
+	_ = overseer.NanoLocalRegister("qam.echo", 0, nil, func(message *qtiny.Message) {
 		_, _ = fmt.Printf("cluster echo %v\n", message.Data)
 		_ = message.Reply(0, message.Data)
 	})
 
-	_ = overseer.ServiceRegister("qam.ping", 0, nil, func(message *qtiny.Message) {
+	_ = overseer.NanoLocalRegister("qam.ping", 0, nil, func(message *qtiny.Message) {
 		_ = message.Reply(0, "pong "+overseer.GetGateway().GetId())
 	})
 

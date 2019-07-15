@@ -40,14 +40,14 @@ func InitLuaService(config map[string]interface{}) {
 		return 1
 	})
 
-	L.Register("ServiceRegister", func(L *lua.State) int {
+	L.Register("NanoLocalRegister", func(L *lua.State) int {
 		var address = L.ToString(1)
-		fmt.Println(address)
-		//L.SetField(lua.LUA_REGISTRYINDEX, )
+		var flag = L.ToInteger(2)
+		// TODO options
 
 		var ref = L.Ref(lua.LUA_REGISTRYINDEX)
 
-		var err = overseer.ServiceRegister(address, 0, nil, func(message *qtiny.Message) {
+		var err = overseer.NanoLocalRegister(address, qtiny.NanoFlag(flag), nil, func(message *qtiny.Message) {
 			var ptrvalue = uintptr(unsafe.Pointer(message))
 			L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
 			L.PushInteger(int64(ptrvalue))
@@ -79,7 +79,7 @@ func InitLuaService(config map[string]interface{}) {
 	}
 
 	/*
-		_ = overseer.ServiceRegister("qam.zk.conn", nil, func(message *qtiny.Message) {
+		_ = overseer.NanoRegister("qam.zk.conn", nil, func(message *qtiny.Message) {
 			var _, id, endpoint, _= getParams(message)
 			var _, err= zookeeper.ZooWatcherGet(id, endpoint)
 			if err == nil {
