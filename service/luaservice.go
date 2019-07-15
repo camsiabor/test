@@ -6,12 +6,12 @@ import (
 	"github.com/camsiabor/golua/luar"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/qtiny"
-	"github.com/camsiabor/test/eventbus"
+	"github.com/camsiabor/test/gateway"
 	"unsafe"
 )
 
 func InitLuaService(config map[string]interface{}) {
-	var overseer = eventbus.GetOverseer()
+	var microroller = gateway.GetMicroroller()
 
 	var luaPath = util.GetStr(config, "../../src/github.com/camsiabor/test/lua/", "lua", "path")
 	var luaCPath = util.GetStr(config, luaPath, "lua", "cpath")
@@ -21,7 +21,7 @@ func InitLuaService(config map[string]interface{}) {
 		panic(err)
 	}
 	luar.Register(L, "tiny", map[string]interface{}{
-		"overseer": overseer,
+		"microroller": microroller,
 	})
 
 	L.Register("Reply", func(L *lua.State) int {
@@ -47,7 +47,7 @@ func InitLuaService(config map[string]interface{}) {
 
 		var ref = L.Ref(lua.LUA_REGISTRYINDEX)
 
-		var err = overseer.NanoLocalRegister(address, qtiny.NanoFlag(flag), nil, func(message *qtiny.Message) {
+		var err = microroller.NanoLocalRegister(address, qtiny.NanoFlag(flag), nil, func(message *qtiny.Message) {
 			var ptrvalue = uintptr(unsafe.Pointer(message))
 			L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
 			L.PushInteger(int64(ptrvalue))

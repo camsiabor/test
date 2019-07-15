@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/test/eventbus"
+	"github.com/camsiabor/test/gateway"
 	"github.com/camsiabor/test/httpt"
 	"github.com/camsiabor/test/service"
 	"os"
@@ -23,8 +23,8 @@ func main() {
 		panic(err)
 	}
 
-	var eventbusConfig = util.GetMap(config, true, "eventbus")
-	eventbus.InitEventBus(eventbusConfig)
+	var gatewayConfig = util.GetMap(config, true, "gateway")
+	gateway.InitGateway(gatewayConfig)
 	service.InitZkTService()
 	service.InitLuaService(config)
 

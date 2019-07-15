@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/css/vue/bs-typeahead/v.css"/>
   <style type="text/css">
     body {
-      font-size: 0.85em;
+        font-size: 0.9em;
     }
 
   </style>
@@ -81,18 +81,18 @@
 
                 <div v-for="method in config.call.method_list">
                   <!--
-                  <a class="dropdown-item" href="#"  v-on:click="select(method, $event);" style="font-size: 0.5em;">{{method}}</a>
+                  <a class="dropdown-item" href="#"  v-on:click="select(method, $event);" style="font-size: 0.75em;">{{method}}</a>
                   -->
                   <button type="button"
                           class="btn btn-sm  btn-outline-secondary"
-                          style="width: 90%; font-size: 0.5em; border: none; "
+                          style="width: 90%; font-size: 0.75em; border: none; "
                           v-on:click="select(method, $event);"
                   >{{method}}
                   </button>
                   <button type="button"
                           class="btn btn-sm  btn-outline-danger"
                           v-on:click="method_list_delete_item(method, $event);"
-                          style="width: 8%; font-size: 0.5em; border: none;">x
+                          style="width: 8%; font-size: 0.75em; border: none;">x
                   </button>
                 </div>
 
@@ -155,8 +155,8 @@
         <div class="card" style="width: 100%; margin-bottom: 3px;" v-for="record in records">
           <div class="card-body">
             <div class="row">
-              <div class="col-4" style="color: grey; font-size: 0.5em;">{{record.consume}} ms</div>
-              <div class="col-8" style="color: grey; font-size: 0.5em;">
+<div class="col-4" style="color: grey; font-size: 0.75em;">{{record.consume}} ms</div>
+<div class="col-8" style="color: grey; font-size: 0.75em;">
                 <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="record.pretty = !record.pretty; $forceUpdate();">{{record.pretty ? 'plain' : 'pretty' }}</button>
               </div>
             </div>
@@ -164,11 +164,13 @@
             <div class="row">
               <div class="col-4">
                 <tree-view v-if="record.pretty" :data="record.request.action !== 'call' ?  record.request.params : record.request" :options="{maxDepth: config.call.request_json_depth, rootObjectKey : ''}"></tree-view>
-                <pre v-else class="card-text" style="color: grey; font-size:0.5em; width:95%">{{record.request.action === 'script' ? record.request.params : record.request}}</pre>
+<pre v-else class="card-text"
+     style="color: grey; font-size:0.75em; width:95%">{{record.request.action === 'script' ? record.request.params : record.request}}</pre>
               </div>
               <div class="col-8" v-if="record.response && record.response.result && !record.response.result.exception">
                 <tree-view v-if="record.pretty" :data="record.response.result.result || record.response.result" :options="{maxDepth: config.call.response_json_depth, rootObjectKey : ''}"></tree-view>
-                <pre v-else class="card-text" style="color: rgb(0, 144, 196); font-size:0.5em; width:95%">{{record.response.result.result || record.response.result}}</pre>
+<pre v-else class="card-text"
+     style="color: rgb(0, 144, 196); font-size:0.75em; width:95%">{{record.response.result.result || record.response.result}}</pre>
               </div>
             </div>
 

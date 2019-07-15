@@ -7,7 +7,6 @@ import (
 	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/qtiny"
-	"github.com/camsiabor/test/eventbus"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -162,7 +161,7 @@ func call(address string, data interface{}, timeout int64) (interface{}, error) 
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	var err error
 	var response *qtiny.Message
-	response, err = eventbus.GetOverseer().Post(request)
+	response, err = gateway.GetOverseer().Post(request)
 	if err != nil {
 		return nil, err
 	}
