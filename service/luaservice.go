@@ -90,4 +90,23 @@ func InitLuaService(config map[string]interface{}) {
 		})
 	*/
 
+	/*
+		go func() {
+
+			var L, _= InitLuaState(luaPath, luaCPath)
+			defer L.Close()
+
+			for {
+				_, _ = RunLuaFile(L, "xor.lua", func(L *lua.State, pan interface{}) {
+					if pan != nil {
+						fmt.Println("error", pan)
+					}
+				})
+
+				time.Sleep(time.Second * time.Duration(3))
+			}
+
+		}()
+	*/
+
 }
