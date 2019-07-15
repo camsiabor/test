@@ -29,6 +29,21 @@ func main() {
 	tina.SetMicroroller(&qtiny.Microroller{})
 	tina.Start(config)
 
+	var guide = &qtiny.TinyGuide{
+		Start: func(tiny qtiny.TinyKind, future qtiny.Future) error {
+			tiny.Register("", 0, nil, func(message *qtiny.Message) {
+
+			})
+
+			return nil
+		},
+	}
+
+	var err = tina.Deploy(guide, nil, 0, nil)
+	if err != nil {
+		panic(err)
+	}
+
 	service.InitZkTService()
 	service.InitLuaService(config)
 
