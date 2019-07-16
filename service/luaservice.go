@@ -48,15 +48,22 @@ func InitLuaService(config map[string]interface{}) {
 
 		var ref = L.Ref(lua.LUA_REGISTRYINDEX)
 
-		var err = microroller.NanoLocalRegister(address, qtiny.NanoFlag(flag), nil, func(message *qtiny.Message) {
-			var ptrvalue = uintptr(unsafe.Pointer(message))
-			L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
-			L.PushInteger(int64(ptrvalue))
-			L.CallHandle(1, 0, func(L *lua.State, pan interface{}) {
-				var err = util.AsError(pan)
-				message.Error(0, err.Error())
-			})
-		})
+		var err = microroller.NanoLocalRegister(
+			&qtiny.Nano{
+				Address: address,
+				Flag:    qtiny.NanoFlag(flag),
+				Options: nil,
+				Handler: func(message *qtiny.Message) {
+					var ptrvalue = uintptr(unsafe.Pointer(message))
+					L.RawGeti(lua.LUA_REGISTRYINDEX, ref)
+					L.PushInteger(int64(ptrvalue))
+					_ = L.CallHandle(1, 0, func(L *lua.State, pan interface{}) {
+						var err = util.AsError(pan)
+						_ = message.Error(0, err.Error())
+					})
+				},
+			},
+		)
 
 		if err == nil {
 			L.PushNil()
