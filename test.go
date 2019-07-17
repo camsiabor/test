@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
+	"github.com/camsiabor/qluatiny/qluatiny"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/camsiabor/test/httpt"
 	"github.com/camsiabor/test/service"
+	"log"
 	"os"
 	"time"
 )
@@ -46,6 +48,27 @@ func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
 	var zkguide = service.ZookeeperTiny()
 	var future = tina.Deploy("zookeeper", zkguide, config, 0, nil)
 	go future.Run()
+
+	var luaConfig = util.GetMap(config, true, "lua")
+	var luaPath = util.GetStr(luaConfig, "../../src/github.com/camsiabor/test/lua", "path")
+	var luaCPath = util.GetStr(luaConfig, luaPath, "cpath")
+	var luaTinys = util.GetMap(luaConfig, true, "tinys")
+
+	for luaMain, tinyConfigOne := range luaTinys {
+		var tinyConfig = util.AsMap(tinyConfigOne, true)
+		var tiny = &qluatiny.LuaTiny{}
+		var guide, err = tiny.Guide(luaMain, luaPath, luaCPath, tinyConfig)
+		if err != nil {
+			panic(err)
+		}
+		future = tina.Deploy("luatiny."+luaMain, guide, tinyConfig, 0, nil)
+		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
+			log.Printf("deploy luatiny %v fail : %v", luaMain, future.ErrCause())
+			return 0
+		})
+
+		go future.Run()
+	}
 
 }
 

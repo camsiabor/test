@@ -1,6 +1,6 @@
 print('hello lua!!!')
 
-local id = tiny.microroller.GetGateway().GetId()
+local id = tina.GetMicroroller().GetGateway().GetId()
 print("lua id", id)
 NanoLocalRegister("qam.lua.test", 0, nil, function(msg)
     print("i am call!")

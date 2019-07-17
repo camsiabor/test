@@ -5,7 +5,10 @@
   },
 
   "lua" : {
-    "path" : "../../src/github.com/camsiabor/test/lua"
+    "path" : "../../src/github.com/camsiabor/test/lua",
+    "tinys" : {
+      "test.lua" : { }
+    }
   },
 
   "gateway" : {
