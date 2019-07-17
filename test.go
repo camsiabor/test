@@ -83,3 +83,28 @@ func initHttp(config map[string]interface{}) {
 	}()
 
 }
+
+func test() {
+
+	var queue = make(chan int, 1024)
+
+	go func() {
+		var i = 1
+		for {
+			queue <- i
+			i++
+			time.Sleep(time.Second)
+		}
+	}()
+
+	for n := 1; n <= 3; n++ {
+		go func(index int) {
+			for {
+				var i = <-queue
+				fmt.Printf("consumer %v   %v\n", index, i)
+			}
+		}(n)
+	}
+
+	<-make(chan bool)
+}
