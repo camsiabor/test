@@ -43,14 +43,10 @@ func initTina(config map[string]interface{}) *qtiny.Tina {
 }
 
 func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
-
 	var zkguide = service.ZookeeperTiny()
-	var _, err = tina.Deploy("zookeeper", zkguide, config, 0, nil)
-	if err != nil {
-		panic(err)
-	}
+	var future = tina.Deploy("zookeeper", zkguide, config, 0, nil)
+	go future.Run()
 
-	service.InitLuaService(config)
 }
 
 func initHttp(config map[string]interface{}) {

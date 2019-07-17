@@ -23,7 +23,7 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 
 	var guide = &qtiny.TinyGuide{}
 
-	guide.Start = func(tiny qtiny.TinyKind, future qtiny.Future) {
+	guide.Start = func(tiny qtiny.TinyKind, config map[string]interface{}, future *qtiny.Future) {
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.echo", 0, nil, func(message *qtiny.Message) {
 			_, _ = fmt.Printf("cluster echo %v\n", message.Data)
