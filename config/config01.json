@@ -5,10 +5,7 @@
   },
 
   "lua" : {
-    "path" : "../../src/github.com/camsiabor/test/lua",
-    "tinys" : {
-      "test.lua" : { }
-    }
+    "test": "lua01.json"
   },
 
   "gateway" : {

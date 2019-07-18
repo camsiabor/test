@@ -1,0 +1,8 @@
+{
+  "meta": {
+    "path": "../../src/github.com/camsiabor/test/lua"
+  },
+  "test": {
+    "main": "test.lua"
+  }
+}
