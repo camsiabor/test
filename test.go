@@ -56,10 +56,7 @@ func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
 
 	for luaMain, tinyConfigOne := range luaTinys {
 		var tinyConfig = util.AsMap(tinyConfigOne, true)
-		var guide = &qluatiny.LuaTinyGuide{}
-		guide.Main = luaMain
-		guide.LuaPath = luaPath
-		guide.LuaCPath = luaCPath
+		var guide = qluatiny.NewLuaTinyGuide(luaMain, luaPath, luaCPath)
 		future = tina.Deploy("luatiny."+luaMain, guide, tinyConfig, 0, nil)
 		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
 			log.Printf("deploy luatiny %v fail : %v", luaMain, future.ErrCause())
