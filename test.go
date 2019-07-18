@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
+	"github.com/camsiabor/qluatiny/qanko"
 	"github.com/camsiabor/qluatiny/qluatiny"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
@@ -59,10 +60,23 @@ func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
 		var guide = qluatiny.NewLuaTinyGuide(luaMain, luaPath, luaCPath)
 		future = tina.Deploy("luatiny."+luaMain, guide, tinyConfig, 0, nil)
 		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
-			log.Printf("deploy luatiny %v fail : %v", luaMain, future.ErrCause())
+			log.Printf("deploy lua tiny %v fail : %v", luaMain, future.ErrCause())
 			return 0
 		})
+		go future.Run()
+	}
 
+	var ankoConfig = util.GetMap(config, true, "anko")
+	var ankoPath = util.GetStr(ankoConfig, "../../src/github.com/camsiabor/test/anko", "path")
+	var ankoTinys = util.GetMap(ankoConfig, true, "tinys")
+	for ankoMain, ankoConfigOne := range ankoTinys {
+		var tinyConfig = util.AsMap(ankoConfigOne, true)
+		var guide = qanko.NewAnkoTinyGuide(ankoPath, ankoMain)
+		future = tina.Deploy("ankotiny."+ankoMain, guide, tinyConfig, 0, nil)
+		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
+			log.Printf("deploy anko tiny %v fail : %v", ankoMain, future.ErrCause())
+			return 0
+		})
 		go future.Run()
 	}
 

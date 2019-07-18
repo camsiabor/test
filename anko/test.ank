@@ -1,0 +1,10 @@
+#!anko
+
+var fmt = import("fmt")
+fmt.Println("anko power!")
+
+
+
+
+
+

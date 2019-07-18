@@ -9,6 +9,8 @@ import (
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/mattn/anko/packages"
+	"github.com/mattn/anko/vm"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -154,6 +156,13 @@ func wshandle(data []byte) (err error, ret []byte) {
 				flag = flag | qtiny.MessageFlagRemoteOnly
 			}
 			result, err = call(address, params, timeout, flag)
+		} else if action == "script" {
+			var script = util.GetStr(request, "", "script")
+			var scriptType = util.GetStr(request, "anko", "type")
+			var name = util.GetStr(request, "", "method")
+			var params = util.GetMap(request, false, "params")
+			var timeout = util.GetInt64(request, 15000, "timeout")
+			result, err = exec(scriptType, script, name, params, timeout)
 		}
 	}
 	if err != nil {
@@ -180,6 +189,13 @@ func call(address string, data interface{}, timeout int64, flag qtiny.MessageFla
 		return nil, fmt.Errorf("%v", response.ReplyErr)
 	}
 	return response.ReplyData, nil
+}
+
+func exec(scriptType string, script string, name string, params interface{}, timeout int64) (interface{}, error) {
+	var env = vm.NewEnv()
+	packages.DefineImport(env)
+	env.SetName(name)
+	return env.Execute(script)
 }
 
 func callp(context *gin.Context) {
