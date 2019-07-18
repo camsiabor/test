@@ -24,7 +24,7 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 
 	var guide = &qtiny.TinyGuide{}
 
-	guide.Start = func(event qtiny.TinyGuideEvent, tiny qtiny.TinyKind, guide *qtiny.TinyGuide, config map[string]interface{}, future *qtiny.Future, err error) {
+	guide.Start = func(event qtiny.TinyGuideEvent, tiny qtiny.TinyKind, guide qtiny.TinyGuideKind, config map[string]interface{}, future *qtiny.Future, err error) {
 
 		if err != nil {
 			log.Printf("zookeeper tiny guide start error %v", err)
