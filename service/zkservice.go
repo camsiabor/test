@@ -6,6 +6,7 @@ import (
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
+	"log"
 
 	"strings"
 	"time"
@@ -23,7 +24,12 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 
 	var guide = &qtiny.TinyGuide{}
 
-	guide.Start = func(tiny qtiny.TinyKind, config map[string]interface{}, future *qtiny.Future) {
+	guide.Start = func(event qtiny.TinyGuideEvent, tiny qtiny.TinyKind, guide *qtiny.TinyGuide, config map[string]interface{}, future *qtiny.Future, err error) {
+
+		if err != nil {
+			log.Printf("zookeeper tiny guide start error %v", err)
+			return
+		}
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.echo", 0, nil, func(message *qtiny.Message) {
 			_, _ = fmt.Printf("cluster echo %v\n", message.Data)
