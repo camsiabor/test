@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/mattn/anko/packages"
 	"github.com/mattn/anko/vm"
+	"log"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -96,23 +97,27 @@ func wsread(conn *websocket.Conn) {
 	for {
 		messageType, data, err := conn.ReadMessage()
 		if err != nil {
+			log.Printf("websocket read message error %v", err.Error())
 			break
 		}
-		err, data = wshandle(data)
-		err = conn.WriteMessage(messageType, data)
-		if err != nil {
-			break
-		}
+		go func() {
+			err, data = wshandle(data)
+			_ = conn.WriteMessage(messageType, data)
+		}()
 	}
 }
 
 func wshandle(data []byte) (err error, ret []byte) {
+
 	var code = 404
 	var consume int64
 	var result interface{} = "handler not found"
 	var response = map[string]interface{}{}
 
+	var start int64
 	defer func() {
+		var end = time.Now().UnixNano()
+		consume = (end - start) / 1000 / 1000
 
 		var pan = recover()
 		if pan != nil {
@@ -121,6 +126,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 		if err != nil {
 			result = qref.StackStringErr(err, 0)
 		}
+
 		response["code"] = code
 		response["result"] = result
 		response["consume"] = consume
@@ -130,47 +136,55 @@ func wshandle(data []byte) (err error, ret []byte) {
 			response["result"] = "marshal response result fail : " + err.Error()
 			ret, _ = json.Marshal(response)
 		}
-
 	}()
 
 	var request map[string]interface{}
 	err = json.Unmarshal(data, &request)
 
-	var start = time.Now().UnixNano()
 	var id = util.GetInt64(request, 0, "id")
+
+	var timeout = util.GetInt64(request, 15*1000, "timeout")
+	if timeout <= 3*1000 {
+		timeout = 3 * 1000
+	}
 	response["id"] = id
-	if err == nil {
-		var action = util.GetStr(request, "", "action")
-		if action == "call" {
-			code = 200
-			var address = util.GetStr(request, "", "method")
-			var params = util.GetMap(request, false, "params")
-			var timeout = util.GetInt64(request, 15000, "timeout")
-			var local = util.GetBool(request, false, "local")
-			var remote = util.GetBool(request, false, "remote")
-			var flag qtiny.MessageFlag
-			if local {
-				flag = flag | qtiny.MessageFlagLocalOnly
+
+	result, err = util.Wait(time.Duration(timeout)*time.Millisecond, func() (i interface{}, e error) {
+
+		start = time.Now().UnixNano()
+		if err == nil {
+			var action = util.GetStr(request, "", "action")
+			if action == "call" {
+				code = 200
+				var address = util.GetStr(request, "", "method")
+				var params = util.GetMap(request, false, "params")
+				var local = util.GetBool(request, false, "local")
+				var remote = util.GetBool(request, false, "remote")
+				var flag qtiny.MessageFlag
+				if local {
+					flag = flag | qtiny.MessageFlagLocalOnly
+				}
+				if remote {
+					flag = flag | qtiny.MessageFlagRemoteOnly
+				}
+				result, err = call(address, params, timeout, flag)
+			} else if action == "script" {
+				var script = util.GetStr(request, "", "script")
+				var scriptType = util.GetStr(request, "anko", "type")
+				var name = util.GetStr(request, "", "method")
+				var params = util.GetMap(request, false, "params")
+				result, err = exec(scriptType, script, name, params, timeout)
 			}
-			if remote {
-				flag = flag | qtiny.MessageFlagRemoteOnly
-			}
-			result, err = call(address, params, timeout, flag)
-		} else if action == "script" {
-			var script = util.GetStr(request, "", "script")
-			var scriptType = util.GetStr(request, "anko", "type")
-			var name = util.GetStr(request, "", "method")
-			var params = util.GetMap(request, false, "params")
-			var timeout = util.GetInt64(request, 15000, "timeout")
-			result, err = exec(scriptType, script, name, params, timeout)
 		}
-	}
-	if err != nil {
-		code = 500
-		result = err.Error()
-	}
-	var end = time.Now().UnixNano()
-	consume = (end - start) / 1000 / 1000
+
+		if err != nil {
+			code = 500
+			result = err.Error()
+		}
+		return result, err
+
+	}, nil)
+
 	return
 }
 
@@ -178,7 +192,6 @@ func call(address string, data interface{}, timeout int64, flag qtiny.MessageFla
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	request.Flag = flag
-
 	var err error
 	var response *qtiny.Message
 	response, err = tina.GetMicroroller().Post(request)
@@ -186,13 +199,14 @@ func call(address string, data interface{}, timeout int64, flag qtiny.MessageFla
 		return nil, err
 	}
 	if response.IsError() {
-		return nil, fmt.Errorf("%v", response.ReplyErr)
+		return nil, util.AsError(response.ReplyErr)
 	}
 	return response.ReplyData, nil
 }
 
 func exec(scriptType string, script string, name string, params interface{}, timeout int64) (interface{}, error) {
 	var env = vm.NewEnv()
+	_ = env.Define("params", params)
 	packages.DefineImport(env)
 	env.SetName(name)
 	return env.Execute(script)
