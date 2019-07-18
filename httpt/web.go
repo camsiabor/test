@@ -111,6 +111,8 @@ func wshandle(data []byte) (err error, ret []byte) {
 
 	var code = 404
 	var consume int64
+	var action string
+	var name string
 	var result interface{} = "handler not found"
 	var response = map[string]interface{}{}
 
@@ -124,7 +126,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 			err = util.AsError(pan)
 		}
 		if err != nil {
-			result = qref.StackStringErr(err, 0)
+			result = action + " @ " + name + "\n" + qref.StackStringErr(err, 0)
 		}
 
 		response["code"] = code
@@ -153,7 +155,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 
 		start = time.Now().UnixNano()
 		if err == nil {
-			var action = util.GetStr(request, "", "action")
+			action = util.GetStr(request, "", "action")
 			if action == "call" {
 				code = 200
 				var address = util.GetStr(request, "", "method")
@@ -167,13 +169,18 @@ func wshandle(data []byte) (err error, ret []byte) {
 				if remote {
 					flag = flag | qtiny.MessageFlagRemoteOnly
 				}
+				name = address
 				result, err = call(address, params, timeout, flag)
 			} else if action == "script" {
 				var script = util.GetStr(request, "", "script")
 				var scriptType = util.GetStr(request, "anko", "type")
-				var name = util.GetStr(request, "", "method")
 				var params = util.GetMap(request, false, "params")
-				result, err = exec(scriptType, script, name, params, timeout)
+				var method = util.GetStr(request, "", "method")
+				if len(method) == 0 {
+					method = util.GetStr(request, "", "name")
+				}
+				name = method
+				result, err = exec(scriptType, script, name, params)
 			}
 		}
 
@@ -204,7 +211,7 @@ func call(address string, data interface{}, timeout int64, flag qtiny.MessageFla
 	return response.ReplyData, nil
 }
 
-func exec(scriptType string, script string, name string, params interface{}, timeout int64) (interface{}, error) {
+func exec(scriptType string, script string, name string, params interface{}) (interface{}, error) {
 	var env = vm.NewEnv()
 	_ = env.Define("params", params)
 	packages.DefineImport(env)
