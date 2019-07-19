@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/camsiabor/go-zookeeper/zk"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/qservice/impl/zookeeper"
+	"github.com/camsiabor/qservice/impl/gateway/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
 	"log"
 
