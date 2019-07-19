@@ -12,10 +12,13 @@ import (
 	"github.com/camsiabor/test/service"
 	"log"
 	"os"
+	"runtime"
 	"time"
 )
 
 func main() {
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	var configPath = "config.json"
 	if len(os.Args) > 1 {
