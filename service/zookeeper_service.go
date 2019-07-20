@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func getParams(message *qtiny.Message) (request map[string]interface{}, id string, endpoint string, path string) {
+func zkGetParams(message *qtiny.Message) (request map[string]interface{}, id string, endpoint string, path string) {
 	request = util.AsMap(message.Data, false)
 	id = util.GetStr(request, "", "id")
 	endpoint = util.GetStr(request, "127.0.0.1:2181", "endpoint")
@@ -31,18 +31,9 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 			return
 		}
 
-		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.echo", 0, nil, func(message *qtiny.Message) {
-			_, _ = fmt.Printf("cluster echo %v\n", message.Data)
-			_ = message.Reply(0, message.Data)
-		}))
-
-		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.ping", 0, nil, func(message *qtiny.Message) {
-			_ = message.Reply(0, "pong "+tiny.GetTina().GetGateway().GetId())
-		}))
-
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.conn", 0, nil, func(message *qtiny.Message) {
-			var _, id, endpoint, _ = getParams(message)
-			var _, err = zookeeper.ZooWatcherGet(id, endpoint)
+			var _, id, endpoint, _ = zkGetParams(message)
+			var _, err = ZooWatcherGet(id, endpoint)
 			if err == nil {
 				_ = message.Reply(0, id+" connected")
 			} else {
@@ -51,8 +42,8 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 		}))
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.close", 0, nil, func(message *qtiny.Message) {
-			var _, id, _, _ = getParams(message)
-			var watcher, _ = zookeeper.ZooWatcherGet(id, "")
+			var _, id, _, _ = zkGetParams(message)
+			var watcher, _ = ZooWatcherGet(id, "")
 			if watcher != nil {
 				_ = watcher.Stop(nil)
 			}
@@ -60,7 +51,7 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 		}))
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.iter", 0, nil, func(message *qtiny.Message) {
-			var request, id, endpoint, path = getParams(message)
+			var request, id, endpoint, path = zkGetParams(message)
 			var depth = util.GetInt(request, 3, "depth")
 			var filter = util.GetStr(request, "", "filter")
 			var timeout = util.GetInt64(request, 5, "timeout")
@@ -68,7 +59,7 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 				id = endpoint
 			}
 
-			var watcher, err = zookeeper.ZooWatcherGet(id, endpoint)
+			var watcher, err = ZooWatcherGet(id, endpoint)
 			if err != nil {
 				_ = message.Error(404, err.Error())
 				return
@@ -81,12 +72,12 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 				var chosen, connected, recvok = util.Timeout(connectChannel, time.Duration(timeout)*time.Second)
 				if chosen < 0 {
 					_ = message.Error(300, "connect to zookeeper timeout : "+id)
-					zookeeper.ZooWatcherClose(id)
+					ZooWatcherClose(id)
 					return
 				}
 				if !connected.Bool() || !recvok {
 					_ = message.Error(500, "instance closed : "+id)
-					zookeeper.ZooWatcherClose(id)
+					ZooWatcherClose(id)
 					return
 				}
 			}
@@ -110,8 +101,8 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 
 		var watches = map[string]<-chan zk.Event{}
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.watch", 0, nil, func(message *qtiny.Message) {
-			var _, id, endpoint, path = getParams(message)
-			var watcher, _ = zookeeper.ZooWatcherGet(id, endpoint)
+			var _, id, endpoint, path = zkGetParams(message)
+			var watcher, _ = ZooWatcherGet(id, endpoint)
 			var conn = watcher.GetConn()
 			var key = id + "@" + path
 

@@ -10,13 +10,53 @@ import (
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/camsiabor/test/httpt"
 	"github.com/camsiabor/test/service"
+	"go.etcd.io/etcd/clientv3"
+	"golang.org/x/net/context"
 	"log"
 	"os"
 	"runtime"
 	"time"
 )
 
+func test() {
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"127.0.0.1:2379"},
+		DialTimeout: time.Duration(10) * time.Second,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	put, err := client.Put(context.TODO(), "hello", "world")
+	if err == nil {
+		fmt.Println(put.PrevKv)
+	} else {
+		fmt.Println(err.Error())
+	}
+
+	for {
+
+		get, err := client.Get(context.TODO(), "hello")
+
+		if err == nil {
+			for _, kv := range get.Kvs {
+				fmt.Println(kv.String())
+			}
+		} else {
+			fmt.Println(err.Error())
+		}
+
+		time.Sleep(time.Second * time.Duration(3))
+	}
+}
+
 func main() {
+
+	test()
+
+	if 1 == 1 {
+		return
+	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
