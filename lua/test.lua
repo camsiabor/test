@@ -8,4 +8,12 @@ NanoLocalRegister({
     end
 })
 
+NanoLocalRegister({
+    Address = "qam.lua.power",
+    Handler = function(msg)
+        Reply(msg, 0, "power " .. id)
+    end
+})
+
+
 
