@@ -22,4 +22,11 @@ qtiny.NanoLocalRegister({
     end
 })
 
+qtiny.AddCloseHandler(function ()
+    tina.GetLogger().Println("i am close! 333333 333")
+end)
+
+qtiny.AddCloseHandler(function ()
+    tina.GetLogger().Println("i am close! 3666 xxx")
+end)
 
