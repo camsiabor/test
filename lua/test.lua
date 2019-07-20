@@ -18,15 +18,12 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.here",
     Handler = function(msg)
-        qtiny.MessageReply(msg, 0, "here is the money " .. id)
+        local info = debug.getinfo(1,'S');
+        qtiny.MessageReply(msg, 0, "here is the money " .. id .. " " .. info.source)
     end
 })
 
 qtiny.AddCloseHandler(function ()
-    tina.GetLogger().Println("i am close! 333333 333")
-end)
-
-qtiny.AddCloseHandler(function ()
-    tina.GetLogger().Println("i am close! 3666 xxx")
+    tina.GetLogger().Println("i am close!")
 end)
 
