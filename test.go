@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	lui "github.com/camsiabor/golua/lua"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/gateway/zookeeper"
@@ -16,14 +15,6 @@ import (
 	"runtime"
 	"time"
 )
-
-type Power struct {
-}
-
-func (o *Power) power(L *lui.State) int {
-	fmt.Println("power!!!!!!!")
-	return 0
-}
 
 func main() {
 

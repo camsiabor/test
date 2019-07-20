@@ -18,7 +18,7 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.here",
     Handler = function(msg)
-        qtiny.MessageReply(msg, 0, "here " .. id)
+        qtiny.MessageReply(msg, 0, "here is the money " .. id)
     end
 })
 
