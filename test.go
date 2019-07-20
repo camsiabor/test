@@ -36,13 +36,17 @@ func test() {
 
 	for {
 
-		get, err := client.Get(context.TODO(), "hello")
-
+		var ctx, _ = context.WithTimeout(context.TODO(), time.Second*time.Duration(3))
+		get, err := client.Get(ctx, "hello")
 		if err == nil {
 			for _, kv := range get.Kvs {
 				fmt.Println(kv.String())
 			}
 		} else {
+
+			switch err {
+
+			}
 			fmt.Println(err.Error())
 		}
 
