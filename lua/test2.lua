@@ -1,11 +1,9 @@
 
 local id = tina.GetMicroroller().GetGateway().GetId()
 
-NanoLocalRegister({
+qtiny.NanoLocalRegister({
     Address = "qam.lua.test2",
     Handler = function(msg)
-        Reply(msg, 0, "test2 " .. id)
+        qtiny.MessageReply(msg, 0, "test 2 " .. id)
     end
 })
-
-

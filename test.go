@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	lui "github.com/camsiabor/golua/lua"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/gateway/zookeeper"
@@ -15,6 +16,14 @@ import (
 	"runtime"
 	"time"
 )
+
+type Power struct {
+}
+
+func (o *Power) power(L *lui.State) int {
+	fmt.Println("power!!!!!!!")
+	return 0
+}
 
 func main() {
 
@@ -92,29 +101,4 @@ func initHttp(config map[string]interface{}) {
 		}
 	}()
 
-}
-
-func test() {
-
-	var queue = make(chan int, 1024)
-
-	go func() {
-		var i = 1
-		for {
-			queue <- i
-			i++
-			time.Sleep(time.Second)
-		}
-	}()
-
-	for n := 1; n <= 3; n++ {
-		go func(index int) {
-			for {
-				var i = <-queue
-				fmt.Printf("consumer %v   %v\n", index, i)
-			}
-		}(n)
-	}
-
-	<-make(chan bool)
 }
