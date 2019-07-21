@@ -52,11 +52,11 @@ func test() {
 
 func main() {
 
-	test()
-
-	if 1 == 1 {
-		return
-	}
+	//test()
+	//
+	//if 1 == 1 {
+	//	return
+	//}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
