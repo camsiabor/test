@@ -11,7 +11,7 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.power",
     Handler = function(msg)
-        qtiny.MessageReply(msg, 0, "power " .. id)
+        qtiny.MessageReply(msg, 0, "power over whelming " .. id)
     end
 })
 
