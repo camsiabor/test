@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/qservice/impl/gateway/zookeeper"
 	"github.com/camsiabor/qservice/impl/tiny/ankotiny"
 	"github.com/camsiabor/qservice/impl/tiny/luatiny"
+	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/camsiabor/test/httpt"
 	"github.com/camsiabor/test/service"
@@ -56,11 +56,11 @@ func test() {
 
 func main() {
 
-	test()
-
-	if 1 == 1 {
-		return
-	}
+	//test()
+	//
+	//if 1 == 1 {
+	//	return
+	//}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -83,7 +83,7 @@ func main() {
 
 func initTina(config map[string]interface{}) *qtiny.Tina {
 	var tina = qtiny.GetTina()
-	tina.SetGateway(&zookeeper.ZGateway{})
+	tina.SetGateway(&zookeeper.ZooGateway{})
 	tina.SetMicroroller(&qtiny.Microroller{})
 	var err = tina.Start(config)
 	if err != nil {
