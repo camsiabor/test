@@ -84,6 +84,7 @@ func main() {
 func initTina(config map[string]interface{}) *qtiny.Tina {
 	var tina = qtiny.GetTina()
 	tina.SetGateway(&zookeeper.ZooGateway{})
+	tina.SetDiscovery(&zookeeper.ZooDiscovery{})
 	tina.SetMicroroller(&qtiny.Microroller{})
 	var err = tina.Start(config)
 	if err != nil {
