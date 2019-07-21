@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/camsiabor/qservice/impl/gateway/zookeeper"
+	"github.com/camsiabor/qservice/impl/zookeeper"
 	"sync"
 )
 

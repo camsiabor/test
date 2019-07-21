@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/camsiabor/qservice/impl/gateway/etcd"
+	"github.com/camsiabor/qservice/impl/etcd"
 	"sync"
 )
 
