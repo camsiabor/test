@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/camsiabor/go-zookeeper/zk"
+	"github.com/camsiabor/qcom/qchan"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
@@ -69,7 +70,7 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 			}
 			var connectChannel = watcher.WaitForConnected()
 			if connectChannel != nil {
-				var chosen, connected, recvok = util.Timeout(connectChannel, time.Duration(timeout)*time.Second)
+				var chosen, connected, recvok = qchan.Timeout(connectChannel, time.Duration(timeout)*time.Second)
 				if chosen < 0 {
 					_ = message.Error(300, "connect to zookeeper timeout : "+id)
 					ZooWatcherClose(id)

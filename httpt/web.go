@@ -3,6 +3,7 @@ package httpt
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/camsiabor/qcom/qchan"
 	"github.com/camsiabor/qcom/qlog"
 	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qcom/util"
@@ -113,6 +114,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 	var consume int64
 	var action string
 	var name string
+	var cut *qref.StackCut
 	var result interface{} = "handler not found"
 	var response = map[string]interface{}{}
 
@@ -126,7 +128,11 @@ func wshandle(data []byte) (err error, ret []byte) {
 			err = util.AsError(pan)
 		}
 		if err != nil {
-			result = action + " @ " + name + "\n" + qref.StackStringErr(err, 0)
+			result = action + " @ " + name + "\n"
+			if cut == nil {
+				cut = qref.StackCutting(1)
+			}
+			result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v\n%v", action, name, err.Error(), cut.File, cut.Line, cut.Func, string(cut.Stack))
 		}
 
 		response["code"] = code
@@ -151,7 +157,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 	}
 	response["id"] = id
 
-	result, err = util.Wait(time.Duration(timeout)*time.Millisecond, func() (i interface{}, e error) {
+	result, cut, err = qchan.Wait(time.Duration(timeout)*time.Millisecond, true, func() (i interface{}, e error) {
 
 		start = time.Now().UnixNano()
 		if err == nil {
