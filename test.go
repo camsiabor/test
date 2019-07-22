@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
+	"github.com/camsiabor/qservice/impl/etcd"
 	"github.com/camsiabor/qservice/impl/tiny/ankotiny"
 	"github.com/camsiabor/qservice/impl/tiny/luatiny"
 	"github.com/camsiabor/qservice/impl/zookeeper"
@@ -83,7 +84,8 @@ func main() {
 
 func initTina(config map[string]interface{}) *qtiny.Tina {
 	var tina = qtiny.GetTina()
-	tina.SetGateway(&zookeeper.ZooGateway{})
+	//tina.SetGateway(&zookeeper.ZooGateway{})
+	tina.SetGateway(&etcd.EtcdGateway{})
 	tina.SetDiscovery(&zookeeper.ZooDiscovery{})
 	tina.SetMicroroller(&qtiny.Microroller{})
 	var err = tina.Start(config)
