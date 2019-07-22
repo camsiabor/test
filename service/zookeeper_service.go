@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/camsiabor/go-zookeeper/zk"
 	"github.com/camsiabor/qcom/qchan"
@@ -49,6 +50,65 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 				_ = watcher.Stop(nil)
 			}
 			_ = message.Reply(0, id+" closed")
+		}))
+
+		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.get", 0, nil, func(message *qtiny.Message) {
+			var _, id, endpoint, path = zkGetParams(message)
+			var watcher, _ = ZooWatcherGet(id, endpoint)
+
+			var data, _, err = watcher.GetConn().Get(path)
+			if err == nil {
+				_ = message.Reply(0, string(data))
+			} else {
+				_ = message.Error(0, err.Error())
+			}
+		}))
+
+		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.set", 0, nil, func(message *qtiny.Message) {
+			var _, id, endpoint, path = zkGetParams(message)
+			var watcher, _ = ZooWatcherGet(id, endpoint)
+
+			var data = util.Get(message.Data, "{}", "data")
+			var bytes, err = json.Marshal(data)
+			if err != nil {
+				_ = message.Error(0, err.Error())
+				return
+			}
+			_, err = watcher.Create(path, bytes, zk.FlagEphemeral, zk.WorldACL(zk.PermAll), true)
+			if err != nil {
+				_ = message.Error(0, err.Error())
+				return
+			}
+			bytes, _, err = watcher.GetConn().Get(path)
+			if err != nil {
+				_ = message.Error(0, err.Error())
+				return
+			}
+			_ = message.Reply(0, string(bytes))
+		}))
+
+		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.children", 0, nil, func(message *qtiny.Message) {
+			var _, id, endpoint, path = zkGetParams(message)
+			var watcher, _ = ZooWatcherGet(id, endpoint)
+
+			var data, _, err = watcher.GetConn().Children(path)
+			if err == nil {
+				_ = message.Reply(0, data)
+			} else {
+				_ = message.Error(0, err.Error())
+			}
+		}))
+
+		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.delete", 0, nil, func(message *qtiny.Message) {
+			var _, id, endpoint, path = zkGetParams(message)
+			var watcher, _ = ZooWatcherGet(id, endpoint)
+
+			var err = watcher.Delete(path, true, true)
+			if err == nil {
+				_ = message.Reply(0, "deleted "+path)
+			} else {
+				_ = message.Error(0, err.Error())
+			}
 		}))
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.iter", 0, nil, func(message *qtiny.Message) {
