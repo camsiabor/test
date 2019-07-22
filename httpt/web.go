@@ -82,7 +82,7 @@ func initRoute(engine *gin.Engine, config map[string]interface{}) {
 	engine.GET("/ws", wsconnect)
 }
 
-var upgrader = websocket.Upgrader{}
+var upgrader = &websocket.Upgrader{}
 
 func wsconnect(context *gin.Context) {
 	var conn, err = upgrader.Upgrade(context.Writer, context.Request, nil)
