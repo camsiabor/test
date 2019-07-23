@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
+	"github.com/camsiabor/qcom/qnet"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/etcd"
 	"github.com/camsiabor/qservice/impl/tiny/ankotiny"
@@ -60,9 +61,14 @@ func main() {
 
 	//test()
 	//
-	//if 1 == 1 {
-	//	return
-	//}
+
+	var ips, _ = qnet.AllNetInterfaceIPString()
+	for _, ip := range ips {
+		fmt.Println(ip)
+	}
+	if 1 == 1 {
+		return
+	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
