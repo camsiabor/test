@@ -204,7 +204,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 func call(address string, data interface{}, timeout int64, flag qtiny.MessageFlag) (interface{}, error) {
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
-	request.Flag = flag
+	request.LocalFlag = flag
 	var err error
 	var response *qtiny.Message
 	response, err = tina.GetMicroroller().Post(request)
