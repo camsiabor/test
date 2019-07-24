@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
-	"github.com/camsiabor/qcom/qnet"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/etcd"
+	"github.com/camsiabor/qservice/impl/httpq"
+	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/tiny/ankotiny"
 	"github.com/camsiabor/qservice/impl/tiny/luatiny"
 	"github.com/camsiabor/qservice/impl/zookeeper"
@@ -62,13 +63,15 @@ func main() {
 	//test()
 	//
 
-	var ips, _ = qnet.AllNetInterfaceIPString()
-	for _, ip := range ips {
-		fmt.Println(ip)
-	}
-	if 1 == 1 {
-		return
-	}
+	/*
+		var ips, _ = qnet.AllNetInterfaceIPString()
+		for _, ip := range ips {
+			fmt.Println(ip)
+		}
+		if 1 == 1 {
+			return
+		}
+	*/
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -97,8 +100,14 @@ func initTina(config map[string]interface{}) *qtiny.Tina {
 
 	if strings.Contains(gatewayType, "zoo") {
 		tina.SetGateway(&zookeeper.ZooGateway{})
-	} else {
+	} else if strings.Contains(gatewayType, "etcd") {
 		tina.SetGateway(&etcd.EtcdGateway{})
+	} else if strings.Contains(gatewayType, "websocket") {
+		tina.SetGateway(&httpq.WebsocketGateway{})
+	} else if strings.Contains(gatewayType, "memory") {
+		tina.SetGateway(&memory.MemGateway{})
+	} else {
+		panic("unknown gateway type " + gatewayType)
 	}
 
 	tina.SetDiscovery(&zookeeper.ZooDiscovery{})
