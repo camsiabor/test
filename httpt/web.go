@@ -132,7 +132,8 @@ func wshandle(data []byte) (err error, ret []byte) {
 			if cut == nil {
 				cut = qref.StackCutting(1)
 			}
-			result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v\n%v", action, name, err.Error(), cut.File, cut.Line, cut.Func, string(cut.Stack))
+			// result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v\n%v", action, name, err.Error(), cut.File, cut.Line, cut.Func, string(cut.Stack))
+			result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v", action, name, err.Error(), cut.File, cut.Line, cut.Func)
 		}
 
 		response["code"] = code
@@ -213,7 +214,7 @@ func call(address string, data interface{}, timeout int64, flag qtiny.MessageFla
 		return nil, err
 	}
 	if response.IsError() {
-		return nil, util.AsError(response.ReplyErr)
+		return nil, util.AsError(response.ReplyErr + "\n\n" + response.ReplyTrace)
 	}
 	return response.ReplyData, nil
 }
