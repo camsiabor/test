@@ -96,19 +96,26 @@ func initTina(config map[string]interface{}) *qtiny.Tina {
 	var tina = qtiny.GetTina()
 	//tina.SetGateway(&zookeeper.ZooGateway{})
 
-	var gatewayType = util.GetStr(config, "zookeeper", "gateway", "type")
-
-	if strings.Contains(gatewayType, "zoo") {
-		tina.SetGateway(&zookeeper.ZooGateway{})
-	} else if strings.Contains(gatewayType, "etcd") {
-		tina.SetGateway(&etcd.EtcdGateway{})
-	} else if strings.Contains(gatewayType, "websocket") {
-		tina.SetGateway(&httpq.WebsocketGateway{})
-	} else if strings.Contains(gatewayType, "memory") {
-		tina.SetGateway(&memory.MemGateway{})
-	} else {
-		panic("unknown gateway type " + gatewayType)
+	var gateways = map[string]qtiny.Gateway{}
+	var gatewayConfigs = util.GetMap(config, true, "gateways")
+	for gatekey, gatewayConfig := range gatewayConfigs {
+		var gateway qtiny.Gateway
+		var gatewayType = util.GetStr(gatewayConfig, "zookkeeper", "type")
+		if strings.Contains(gatewayType, "zoo") {
+			gateway = &zookeeper.ZooGateway{}
+		} else if strings.Contains(gatewayType, "etcd") {
+			gateway = &etcd.EtcdGateway{}
+		} else if strings.Contains(gatewayType, "websocket") {
+			gateway = &httpq.WebsocketGateway{}
+		} else if strings.Contains(gatewayType, "memory") {
+			gateway = &memory.MemGateway{}
+		} else {
+			panic("unknown gateway type " + gatewayType)
+		}
+		gateways[gatekey] = gateway
 	}
+
+	tina.SetGateways(gateways, "")
 
 	tina.SetDiscovery(&zookeeper.ZooDiscovery{})
 	tina.SetMicroroller(&qtiny.Microroller{})
