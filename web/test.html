@@ -1,411 +1,429 @@
 <!DOCTYPE html>
 
-<head xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>ag-test</title>
+    <title>ag-test</title>
 
-  <link rel="stylesheet" href="/css/bs/bootstrap.css"/>
-  <link rel="stylesheet" href="/css/bs/bootstrap-grid.css"/>
-  <link rel="stylesheet" href="/css/bs/bootstrap-reboot.css"/>
-  <link rel="stylesheet" href="/css/vue/json-tree-view/v.css"/>
-  <link rel="stylesheet" href="/css/vue/bs-typeahead/v.css"/>
-  <style type="text/css">
-    body {
-        font-size: 0.9em;
-    }
+    <link rel="stylesheet" href="/css/bs/bootstrap.css"/>
+    <link rel="stylesheet" href="/css/bs/bootstrap-grid.css"/>
+    <link rel="stylesheet" href="/css/bs/bootstrap-reboot.css"/>
+    <link rel="stylesheet" href="/css/vue/json-tree-view/v.css"/>
+    <link rel="stylesheet" href="/css/vue/bs-typeahead/v.css"/>
+    <style type="text/css">
+        body {
+            font-size: 0.9em;
+        }
 
-  </style>
+    </style>
 </head>
 
-<body >
+<body>
 
-  <div id="vcontainer" style="padding: 12px;">
+<div id="vcontainer" style="padding: 12px;">
 
     <!-- vue scope start -->
 
     <div class="row" v-if="type() === TEST">
-      <div class="col-10">
-        <h5>{{type()}}</h5>
-      </div>
-      <div class="col-2">
-      </div>
+        <div class="col-10">
+            <h5>{{type()}}</h5>
+        </div>
+        <div class="col-2">
+        </div>
 
     </div>
 
     <div class="row" v-if="type() === PLATFORM">
-      <div class="col-10">
-        <h5>{{type()}}</h5>
-      </div>
-      <div class="col-1" style="color: orange">
-        <h5>{{session.balance}}</h5>
-      </div>
-      <div class="col-1" style="color: rgb(160, 160, 160)">
-        <h5>{{session.currency}}</h5>
-      </div>
+        <div class="col-10">
+            <h5>{{type()}}</h5>
+        </div>
+        <div class="col-1" style="color: orange">
+            <h5>{{session.balance}}</h5>
+        </div>
+        <div class="col-1" style="color: rgb(160, 160, 160)">
+            <h5>{{session.currency}}</h5>
+        </div>
     </div>
 
-    <div class="row" style="margin-bottom: 5px;">
-      <div class="col-4">
+<div class="row" style="margin-bottom: 5px;">
+    <div class="col-4">
 
 
         <div class="input-group">
 
 
-          <button type="button" class="btn btn-outline-warning dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">type</span>
-          </button>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="#" v-on:click="reconnect('test')">test</a>
-            <a class="dropdown-item" href="#" v-on:click="reconnect('platform')">platform</a>
-          </div>
+            <button type="button" class="btn btn-outline-warning dropdown-toggle dropdown-toggle-split"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">type</span>
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" v-on:click="reconnect('test')">test</a>
+                <a class="dropdown-item" href="#" v-on:click="reconnect('platform')">platform</a>
+            </div>
 
-          <vue-bootstrap-typeahead
-            style="width: 90%;"
-            ref="call_method_typeahead"
-            :input="config.call.method"
-            v-model="config.call.method"
-            :data="config.call.method_list"
-            minMatchingChars="1"
-            @hit="select"
-          >
-            <template slot="append">
-              <button type="button" class="btn btn-outline-info" @click="exec" v-if="type() === TEST">exec</button>
-              <button type="button" class="btn btn-outline-info" v-on:click="call({'local':true})">local</button>
-                <button type="button" class="btn btn-outline-info" v-on:click="call({'remote':true})">remote</button>
-                <button type="button" class="btn btn-outline-info" v-on:click="call()">auto</button>
-              <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu" style="width: 66%">
+            <vue-bootstrap-typeahead
+                    style="width: 90%;"
+                    ref="call_method_typeahead"
+                    :input="config.call.method"
+                    v-model="config.call.method"
+                    :data="config.call.method_list"
+                    minMatchingChars="1"
+                    @hit="select"
+            >
+                <template slot="append">
+                    <button type="button" class="btn btn-outline-info" @click="exec" v-if="type() === TEST">exec
+                    </button>
+                    <button type="button" class="btn btn-outline-info" v-on:click="call({'local':true})">local</button>
+                    <button type="button" class="btn btn-outline-info" v-on:click="call({'remote':true})">remote
+                    </button>
+                    <button type="button" class="btn btn-outline-info" v-on:click="call()">auto</button>
+                    <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu" style="width: 66%">
 
-                <div v-for="method in config.call.method_list">
-                  <!--
+                        <div v-for="method in config.call.method_list">
+                            <!--
                   <a class="dropdown-item" href="#"  v-on:click="select(method, $event);" style="font-size: 0.75em;">{{method}}</a>
                   -->
-                  <button type="button"
-                          class="btn btn-sm  btn-outline-secondary"
-                          style="width: 90%; font-size: 0.75em; border: none; "
-                          v-on:click="select(method, $event);"
-                  >{{method}}
-                  </button>
-                  <button type="button"
-                          class="btn btn-sm  btn-outline-danger"
-                          v-on:click="method_list_delete_item(method, $event);"
-                          style="width: 8%; font-size: 0.75em; border: none;">x
-                  </button>
-                </div>
+                            <button type="button"
+                                    class="btn btn-sm  btn-outline-secondary"
+                                    style="width: 90%; font-size: 0.75em; border: none; "
+                                    v-on:click="select(method, $event);"
+                            >{{method}}
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm  btn-outline-danger"
+                                    v-on:click="method_list_delete_item(method, $event);"
+                                    style="width: 8%; font-size: 0.75em; border: none;">x
+                            </button>
+                        </div>
 
-              </div>
-            </template>
-          </vue-bootstrap-typeahead>
+                    </div>
+                </template>
+            </vue-bootstrap-typeahead>
 
 
         </div>
-      </div>
-      <div class="col-8">
-        <button type="button" class="btn btn-outline-secondary" style="height: 100%" v-on:click="record_clear(); ">
-          clear.history
-        </button>
-        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_socket" style="height: 100%">
-          config.connect
-        </button>
-        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_game" style="height: 100%">
-          config.game
-        </button>
-        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_call" style="height: 100%">
-          config.call
-        </button>
-        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_timer" style="height: 100%">
-          config.timer
-        </button>
-        <button type="button" class="btn btn-danger" v-on:click="timer_invoke();">
-          {{config.timer.active ? 'timer.stop' : 'timer.start' }}
-        </button>
-        <button type="button" class="btn btn-danger" v-if="config.socket.type === PLATFORM" v-on:click="play(0, null, config.game.emulation);">
-          emulate
-        </button>
-        <button type="button" class="btn btn-danger" v-if="config.socket.type === PLATFORM" v-on:click="play();">
-          play
-        </button>
-      </div>
     </div>
+<div class="col-8">
+    <button type="button" class="btn btn-outline-secondary" style="height: 100%" v-on:click="record_clear(); ">
+        clear.history
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_socket"
+            style="height: 100%">
+        config.connect
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_game"
+            style="height: 100%">
+        config.game
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_call"
+            style="height: 100%">
+        config.call
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal_config_timer"
+            style="height: 100%">
+        config.timer
+    </button>
+<button type="button" class="btn btn-danger" v-on:click="timer_invoke();">
+{{config.timer.active ? 'timer.stop' : 'timer.start' }}
+</button>
+    <button type="button" class="btn btn-danger" v-if="config.socket.type === PLATFORM"
+            v-on:click="play(0, null, config.game.emulation);">
+        emulate
+    </button>
+    <button type="button" class="btn btn-danger" v-if="config.socket.type === PLATFORM" v-on:click="play();">
+        play
+    </button>
+</div>
+</div>
 
 
+<div class="row">
+<div class="col-4">
     <div class="row">
-      <div class="col-4">
-        <div class="row">
-          <div class="col-12" style="border: 1px solid rgb(172, 172, 172); border-radius: 5px;">
+        <div class="col-12" style="border: 1px solid rgb(172, 172, 172); border-radius: 5px;">
             <pre id="editor_params" v-bind:style="{ width: '100%', height: 300 + 'px' }"><textarea></textarea></pre>
-          </div>
         </div>
-        <div class="row" style="margin-top: 5px;">
-          <div class="col-12" style="border: 1px solid rgb(172, 172, 172); border-radius: 5px;">
+    </div>
+    <div class="row" style="margin-top: 5px;">
+        <div class="col-12" style="border: 1px solid rgb(172, 172, 172); border-radius: 5px;">
             <pre id="editor_script" v-bind:style="{ width: '100%', height: 300 + 'px' }"><textarea></textarea></pre>
-          </div>
         </div>
-        <div class="row" style="margin-top: 5px;">
-          <div class="col-12">
-            <pre v-for="msg in msgs" :style="{color:msg.color}">{{msg.time}} {{msg.msg}}</pre>
-          </div>
-        </div>
-      </div>
-      <div class="col-8">
+    </div>
+<div class="row" style="margin-top: 5px;">
+<div class="col-12">
+<pre v-for="msg in msgs" :style="{color:msg.color}">{{msg.time}} {{msg.msg}}</pre>
+</div>
+</div>
+</div>
+<div class="col-8">
 
-        <div class="card" style="width: 100%; margin-bottom: 3px;" v-for="record in records">
-          <div class="card-body">
-            <div class="row">
+<div class="card" style="width: 100%; margin-bottom: 3px;" v-for="record in records">
+<div class="card-body">
+<div class="row">
 <div class="col-4" style="color: grey; font-size: 0.75em;">{{record.consume}} ms</div>
 <div class="col-8" style="color: grey; font-size: 0.75em;">
-                <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="record.pretty = !record.pretty; $forceUpdate();">{{record.pretty ? 'plain' : 'pretty' }}</button>
-              </div>
-            </div>
-            <!-- result -->
-            <div class="row">
-              <div class="col-4">
-                <tree-view v-if="record.pretty" :data="record.request.action !== 'call' ?  record.request.params : record.request" :options="{maxDepth: config.call.request_json_depth, rootObjectKey : ''}"></tree-view>
+<button type="button" class="btn btn-sm btn-outline-secondary"
+        v-on:click="record.pretty = !record.pretty; $forceUpdate();">{{record.pretty ? 'plain' : 'pretty' }}</button>
+</div>
+</div>
+    <!-- result -->
+<div class="row">
+<div class="col-4">
+    <tree-view v-if="record.pretty" :data="record.request.action !== 'call' ?  record.request.params : record.request"
+               :options="{maxDepth: config.call.request_json_depth, rootObjectKey : ''}"></tree-view>
 <pre v-else class="card-text"
      style="color: grey; font-size:0.75em; width:95%">{{record.request.action === 'script' ? record.request.params : record.request}}</pre>
-              </div>
-              <div class="col-8" v-if="record.response && record.response.result && !record.response.result.exception">
-                <tree-view v-if="record.pretty" :data="record.response.result.result || record.response.result" :options="{maxDepth: config.call.response_json_depth, rootObjectKey : ''}"></tree-view>
+</div>
+<div class="col-8" v-if="record.response && record.response.result && !record.response.result.exception">
+    <tree-view v-if="record.pretty" :data="record.response.result.result || record.response.result"
+               :options="{maxDepth: config.call.response_json_depth, rootObjectKey : ''}"></tree-view>
 <pre v-else class="card-text"
      style="color: rgb(0, 144, 196); font-size:0.75em; width:95%">{{record.response.result.result || record.response.result}}</pre>
-              </div>
-            </div>
+</div>
+</div>
 
-            <!-- script -->
-            <div v-if="record.response && record.request.action === 'script'">
-              <!-- stdout -->
-              <div class="row" v-if="record.response.result.stdout">
-                <div class="col-4">
-                </div>
-                <div class="col-8">
-                  <pre style="color: grey; border-top: 1px solid rgb(224, 224, 224); margin-top: 5px;">{{record.response.result.stdout}}</pre>
-                </div>
-              </div>
-              <!-- stderr -->
-              <div class="row" v-if="record.response.result.stderr">
-                <div class="col-4">
-                </div>
-                <div class="col-8">
-                  <pre style="color: grey; border-top: 1px solid rgb(224, 224, 224); margin-top: 5px;">{{record.response.result.stderr}}</pre>
-                </div>
-              </div>
-              <!-- exception -->
-              <div class="row" v-if="record.response.result.exception">
-                <div class="col-4">
-                </div>
-                <div class="col-8">
-                  <pre style="color: red; border-top: 1px solid rgb(255, 128, 128); ">{{record.response.result.exception}}</pre>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
+    <!-- script -->
+<div v-if="record.response && record.request.action === 'script'">
+    <!-- stdout -->
+<div class="row" v-if="record.response.result.stdout">
+    <div class="col-4">
     </div>
+<div class="col-8">
+<pre style="color: grey; border-top: 1px solid rgb(224, 224, 224); margin-top: 5px;">{{record.response.result.stdout}}</pre>
+</div>
+</div>
+    <!-- stderr -->
+<div class="row" v-if="record.response.result.stderr">
+    <div class="col-4">
+    </div>
+<div class="col-8">
+<pre style="color: grey; border-top: 1px solid rgb(224, 224, 224); margin-top: 5px;">{{record.response.result.stderr}}</pre>
+</div>
+</div>
+    <!-- exception -->
+<div class="row" v-if="record.response.result.exception">
+    <div class="col-4">
+    </div>
+<div class="col-8">
+<pre style="color: red; border-top: 1px solid rgb(255, 128, 128); ">{{record.response.result.exception}}</pre>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
 
     <!------------------------------------------ modal ------------------------------------------>
 
     <div class="modal fade" id="modal_config_socket" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">config connect</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label class="col-form-label" for="endpoint">type</label>
-                <select class="custom-select" id="endpoint" v-model="config.socket.type">
-                  <option value="test">test</option>
-                  <option value="platform">platform</option>
-                </select>
-              </div>
-              <div class="form-group" v-if="config.socket.type === 'test'">
-                <label class="col-form-label">test.url</label>
-                <input type="text" class="form-control" v-model="config.socket.test.url">
-              </div>
-              <div class="form-group" v-if="config.socket.type === 'platform'">
-                <label class="col-form-label">platform.url</label>
-                <input type="text" class="form-control" v-model="config.socket.platform.url">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">reconnect.interval</label>
-                <input type="text" class="form-control" v-model="config.socket.reconnect">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">username</label>
-                <input type="text" class="form-control" v-model="config.game.username">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">password</label>
-                <input type="text" class="form-control" v-model="config.game.password">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">operator_id</label>
-                <input type="text" class="form-control" v-model="config.game.operator_id">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">id</label>
-                <input type="text" class="form-control" v-model="config.game.id">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
-            <button type="button" class="btn btn-primary" v-on:click="reconnect()">reconnect</button>
-          </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">config connect</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="col-form-label" for="endpoint">type</label>
+                            <select class="custom-select" id="endpoint" v-model="config.socket.type">
+                                <option value="test">test</option>
+                                <option value="platform">platform</option>
+                            </select>
+                        </div>
+                        <div class="form-group" v-if="config.socket.type === 'test'">
+                            <label class="col-form-label">test.url</label>
+                            <input type="text" class="form-control" v-model="config.socket.test.url">
+                        </div>
+                        <div class="form-group" v-if="config.socket.type === 'platform'">
+                            <label class="col-form-label">platform.url</label>
+                            <input type="text" class="form-control" v-model="config.socket.platform.url">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">reconnect.interval</label>
+                            <input type="text" class="form-control" v-model="config.socket.reconnect">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">username</label>
+                            <input type="text" class="form-control" v-model="config.game.username">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">password</label>
+                            <input type="text" class="form-control" v-model="config.game.password">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">operator_id</label>
+                            <input type="text" class="form-control" v-model="config.game.operator_id">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">id</label>
+                            <input type="text" class="form-control" v-model="config.game.id">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                    <button type="button" class="btn btn-primary" v-on:click="reconnect()">reconnect</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
 
     <div class="modal fade" id="modal_config_game" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">config game parameters</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label class="col-form-label">type</label>
-                <input type="text" class="form-control" v-model="config.game.type">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">bet_multiplier</label>
-                <input type="text" class="form-control" v-model="config.game.bet_multiplier">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">emulation</label>
-                <textarea class="form-control" v-model="config.game.emulation"></textarea>
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">progressive_magnifier</label>
-                <input type="input" class="form-control" v-model="config.game.progressive_magnifier">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
-            <button type="button" class="btn btn-primary" v-on:click="config_save(true)">save</button>
-          </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">config game parameters</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="col-form-label">type</label>
+                            <input type="text" class="form-control" v-model="config.game.type">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">bet_multiplier</label>
+                            <input type="text" class="form-control" v-model="config.game.bet_multiplier">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">emulation</label>
+                            <textarea class="form-control" v-model="config.game.emulation"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">progressive_magnifier</label>
+                            <input type="input" class="form-control" v-model="config.game.progressive_magnifier">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                    <button type="button" class="btn btn-primary" v-on:click="config_save(true)">save</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="modal fade" id="modal_config_call" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">config call parameters</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label class="col-form-label">timeout</label>
-                <input type="text" class="form-control" v-model="config.call.timeout">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">method.list.limit</label>
-                <input type="text" class="form-control" v-model="config.call.method_list_limit">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">request.json.depth</label>
-                <input type="text" class="form-control" v-model="config.call.request_json_depth">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">response.json.depth</label>
-                <input type="text" class="form-control" v-model="config.call.response_json_depth">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">response.json.pretty</label>
-                <input type="text" class="form-control" v-model="config.call.response_json_pretty">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">editor.params.height</label>
-                <input type="text" class="form-control" v-model="config.editor.params_height">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">editor.script.height</label>
-                <input type="text" class="form-control" v-model="config.editor.script_height">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
-            <button type="button" class="btn btn-primary" v-on:click="config_save(true); editor_init();">save</button>
-          </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">config call parameters</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="col-form-label">gatekey</label>
+                            <input type="text" class="form-control" v-model="config.call.gatekey">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">timeout</label>
+                            <input type="text" class="form-control" v-model="config.call.timeout">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">method.list.limit</label>
+                            <input type="text" class="form-control" v-model="config.call.method_list_limit">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">request.json.depth</label>
+                            <input type="text" class="form-control" v-model="config.call.request_json_depth">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">response.json.depth</label>
+                            <input type="text" class="form-control" v-model="config.call.response_json_depth">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">response.json.pretty</label>
+                            <input type="text" class="form-control" v-model="config.call.response_json_pretty">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">editor.params.height</label>
+                            <input type="text" class="form-control" v-model="config.editor.params_height">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">editor.script.height</label>
+                            <input type="text" class="form-control" v-model="config.editor.script_height">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                    <button type="button" class="btn btn-primary" v-on:click="config_save(true); editor_init();">save
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="modal fade" id="modal_config_timer" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">config timer</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label class="col-form-label">timer.type</label>
-                <input type="text" class="form-control" v-model="config.timer.type">
-              </div>
-              <div class="form-group">
-                <label class="col-form-label">timer.interval</label>
-                <input type="text" class="form-control" v-model="config.timer.interval">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
-            <button type="button" class="btn btn-primary" v-on:click="config_save(true);">save</button>
-          </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">config timer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="col-form-label">timer.type</label>
+                            <input type="text" class="form-control" v-model="config.timer.type">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">timer.interval</label>
+                            <input type="text" class="form-control" v-model="config.timer.interval">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                    <button type="button" class="btn btn-primary" v-on:click="config_save(true);">save</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- vue scope start -->
-  </div>
+</div>
 
 
-  <!------------------------------------------ script ------------------------------------------>
+<!------------------------------------------ script ------------------------------------------>
 
-  <script type="text/javascript" src="/js/jquery/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery/jquery.js"></script>
 
-  <script type="text/javascript" src="/js/bs/popper.js"></script>
-  <script type="text/javascript" src="/js/bs/bootstrap.min.js"></script>
-  <script type="text/javascript" src="/js/bs/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="/js/bs/popper.js"></script>
+<script type="text/javascript" src="/js/bs/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/bs/bootstrap.bundle.min.js"></script>
 
-  <script type="text/javascript" src="/js/vue/vue.min.js"></script>
-  <script type="text/javascript" src="/js/vue/json-tree-view/v.js"></script>
-  <script type="text/javascript" src="/js/vue/bs-typeahead/v.js"></script>
-  <script type="text/javascript" src="/js/vue/treegrid/v.js"></script>
+<script type="text/javascript" src="/js/vue/vue.min.js"></script>
+<script type="text/javascript" src="/js/vue/json-tree-view/v.js"></script>
+<script type="text/javascript" src="/js/vue/bs-typeahead/v.js"></script>
+<script type="text/javascript" src="/js/vue/treegrid/v.js"></script>
 
-  <script type="text/javascript" src="/js/ace/ace.js"></script>
+<script type="text/javascript" src="/js/ace/ace.js"></script>
 
-  <script type="text/javascript" src="/js/util/util.js"></script>
-  <script type="text/javascript" src="/js/util/const.js"></script>
+<script type="text/javascript" src="/js/util/util.js"></script>
+<script type="text/javascript" src="/js/util/const.js"></script>
 
-  <script type="text/javascript" src="test.js"></script>
+<script type="text/javascript" src="test.js"></script>
 
 </body>
 </html>

@@ -173,6 +173,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 				var params = util.GetMap(request, false, "params")
 				var local = util.GetBool(request, false, "local")
 				var remote = util.GetBool(request, false, "remote")
+				var gatekey = util.GetStr(request, "", "gatekey")
 				var flag qtiny.MessageFlag
 				if local {
 					flag = flag | qtiny.MessageFlagLocalOnly
@@ -181,7 +182,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 					flag = flag | qtiny.MessageFlagRemoteOnly
 				}
 				name = address
-				result, err = call(address, params, timeout, flag)
+				result, err = call(address, params, gatekey, timeout, flag)
 			} else if action == "script" {
 				var script = util.GetStr(request, "", "script")
 				var scriptType = util.GetStr(request, "anko", "type")
@@ -206,14 +207,14 @@ func wshandle(data []byte) (err error, ret []byte) {
 	return
 }
 
-func call(address string, data interface{}, timeout int64, flag qtiny.MessageFlag) (interface{}, error) {
+func call(address string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (interface{}, error) {
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	request.LocalFlag = flag
 
 	var err error
 	var response *qtiny.Message
-	response, err = tina.GetMicroroller().Post("", request)
+	response, err = tina.GetMicroroller().Post(gatekey, request)
 	if err != nil {
 		return nil, err
 	}
@@ -234,9 +235,11 @@ func exec(scriptType string, script string, name string, params interface{}) (in
 func callp(context *gin.Context) {
 	var data = context.Query("data")
 	var address = context.Query("address")
+	var gatekey = context.Query("gatekey")
 	var timeout = util.AsInt64(context.Query("timeout"), 15000)
 	var local = util.AsBool(context.Query("local"), false)
 	var remote = util.AsBool(context.Query("remote"), false)
+
 	var flag qtiny.MessageFlag
 	if local {
 		flag = flag | qtiny.MessageFlagLocalOnly
@@ -244,7 +247,7 @@ func callp(context *gin.Context) {
 	if remote {
 		flag = flag | qtiny.MessageFlagRemoteOnly
 	}
-	var ret, err = call(address, data, timeout, flag)
+	var ret, err = call(address, data, gatekey, timeout, flag)
 	if err != nil {
 		var reply = fmt.Sprintf("%v", err)
 		context.String(500, reply)

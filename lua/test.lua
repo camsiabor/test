@@ -1,17 +1,16 @@
-
-local id = tina.GetMicroroller().GetGateway().GetId()
+local nodeId = tina.GetNodeId()
 
 qtiny.NanoLocalRegister({
     Address = "qam.lua.test",
     Handler = function(msg)
-        qtiny.MessageReply(msg, 0, "test " .. id)
+        qtiny.MessageReply(msg, 0, "test " .. nodeId)
     end
 })
 
 qtiny.NanoLocalRegister({
     Address = "qam.lua.power",
     Handler = function(msg)
-        qtiny.MessageReply(msg, 0, "power over whelming " .. id)
+        qtiny.MessageReply(msg, 0, "power over whelming " .. nodeId)
     end
 })
 
@@ -19,7 +18,7 @@ qtiny.NanoLocalRegister({
     Address = "qam.lua.here",
     Handler = function(msg)
         local info = debug.getinfo(1,'S');
-        qtiny.MessageReply(msg, 0, "here is the money " .. id .. " " .. info.source)
+        qtiny.MessageReply(msg, 0, "here is the money " .. nodeId .. " " .. info.source)
     end
 })
 
