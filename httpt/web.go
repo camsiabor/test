@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
@@ -94,6 +95,7 @@ func wsconnect(context *gin.Context) {
 }
 
 func wsread(conn *websocket.Conn) {
+	var mutex sync.Mutex
 	defer conn.Close()
 	for {
 		messageType, data, err := conn.ReadMessage()
@@ -103,7 +105,9 @@ func wsread(conn *websocket.Conn) {
 		}
 		go func() {
 			err, data = wshandle(data)
+			mutex.Lock()
 			_ = conn.WriteMessage(messageType, data)
+			mutex.Unlock()
 		}()
 	}
 }
