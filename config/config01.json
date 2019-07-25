@@ -17,11 +17,21 @@
       "test.ank" : { }
     }
   },
-
-  "gateway" : {
-    "type" : "zookeeper",
-    "endpoints" : [ "127.0.0.1:12181" ],
-    "session.timeout" : 10
+  "gateways": {
+    "zk": {
+      "type": "zookeeper",
+      "endpoints": [
+        "127.0.0.1:12181"
+      ],
+      "session.timeout": 10
+    },
+    "ws": {
+      "type": "websocket",
+      "endpoints": [
+        "ws://127.0.0.1:20001"
+      ],
+      "session.timeout": 10
+    }
   },
 
   "discovery" : {
