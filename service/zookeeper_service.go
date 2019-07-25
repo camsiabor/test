@@ -102,10 +102,16 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.delete", 0, nil, func(message *qtiny.Message) {
 			var _, id, endpoint, path = zkGetParams(message)
 			var watcher, _ = ZooWatcherGet(id, endpoint)
-
 			var err = watcher.Delete(path, true, true)
 			if err == nil {
-				_ = message.Reply(0, "deleted "+path)
+				util.AsMap(message.Data, false)["path"] = "/"
+				response, err := tiny.Post("", qtiny.NewMessage("qam.zk.iter", message.Data, time.Second*time.Duration(5)))
+				if err == nil {
+					_ = message.Reply(0, response.ReplyData)
+				} else {
+					_ = message.Error(0, err.Error())
+				}
+
 			} else {
 				_ = message.Error(0, err.Error())
 			}

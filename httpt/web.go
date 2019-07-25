@@ -205,6 +205,7 @@ func call(address string, data interface{}, timeout int64, flag qtiny.MessageFla
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	request.LocalFlag = flag
+
 	var err error
 	var response *qtiny.Message
 	response, err = tina.GetMicroroller().Post("", request)
