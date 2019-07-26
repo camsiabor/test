@@ -90,9 +90,18 @@ func generateGateway(gatewayType string) qtiny.Gateway {
 		return &httpq.WebsocketGateway{}
 	} else if strings.Contains(gatewayType, "memory") {
 		return &memory.MemGateway{}
-	} else {
-		panic("unknown gateway type " + gatewayType)
 	}
+	panic("unknown gateway type " + gatewayType)
+
+}
+
+func generateDiscovery(discoveryType string) qtiny.Discovery {
+	if strings.Contains(discoveryType, "mem") {
+		return &memory.MemDiscovery{}
+	} else if strings.Contains(discoveryType, "zoo") {
+		return &zookeeper.ZooDiscovery{}
+	}
+	panic("unknown gateway type " + discoveryType)
 }
 
 func initTina(config map[string]interface{}) *qtiny.Tina {
@@ -103,15 +112,22 @@ func initTina(config map[string]interface{}) *qtiny.Tina {
 	var gatewayConfigs = util.GetMap(config, true, "gateways")
 	for gatekey, v := range gatewayConfigs {
 		var gatewayConfig = util.AsMap(v, true)
+		var active = util.GetBool(gatewayConfig, true, "active")
+		if !active {
+			continue
+		}
 		var gatewayType = util.GetStr(gatewayConfig, "zookkeeper", "type")
 		var gateway = generateGateway(gatewayType)
 		gateway.SetConfig(gatewayConfig)
 		gateways[gatekey] = gateway
 	}
 
+	var discoveryType = util.GetStr(config, "mem", "discovery", "type")
+	var discovery = generateDiscovery(discoveryType)
+
 	var gatewaydef = util.GetStr(config, "", "gateway.default")
 	tina.SetGateways(gateways, gatewaydef)
-	tina.SetDiscovery(&zookeeper.ZooDiscovery{})
+	tina.SetDiscovery(discovery)
 	tina.SetMicroroller(&qtiny.Microroller{})
 	var err = tina.Start(config)
 	if err != nil {
