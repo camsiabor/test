@@ -3,6 +3,7 @@ local nodeId = tina.GetNodeId()
 qtiny.NanoLocalRegister({
     Address = "qam.lua.test",
     Handler = function(msg)
+        tina.GetLogger().Println("test!")
         qtiny.MessageReply(msg, 0, "test " .. nodeId)
     end
 })

@@ -62,6 +62,8 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
+	qtiny.MessageTraceDepthDefault = 6
+
 	var configPath = "config.json"
 	if len(os.Args) > 1 {
 		configPath = os.Args[1]

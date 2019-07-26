@@ -104,10 +104,14 @@ func wsread(conn *websocket.Conn) {
 			break
 		}
 		go func() {
-			err, data = wshandle(data)
-			mutex.Lock()
-			_ = conn.WriteMessage(messageType, data)
-			mutex.Unlock()
+			_, data = wshandle(data)
+			if data != nil {
+				func() {
+					mutex.Lock()
+					defer mutex.Unlock()
+					_ = conn.WriteMessage(messageType, data)
+				}()
+			}
 		}()
 	}
 }
@@ -137,6 +141,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 				cut = qerr.StackCutting(1, 1024)
 			}
 			result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v\n%v", action, name, err.Error(), cut.File, cut.Line, cut.Func, string(cut.Stack))
+			// qerr.StackStringErr(1, 1024, "%v : %v %v\n", action, name, err.Error())
 			//result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v", action, name, err.Error(), cut.File, cut.Line, cut.Func)
 		}
 
@@ -204,7 +209,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 
 	}, nil)
 
-	return
+	return err, ret
 }
 
 func call(address string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (interface{}, error) {
