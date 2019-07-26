@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/camsiabor/qcom/qchan"
+	"github.com/camsiabor/qcom/qerr"
 	"github.com/camsiabor/qcom/qlog"
-	"github.com/camsiabor/qcom/qref"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/gin-gonic/gin"
@@ -50,7 +50,7 @@ func InitWeb(config map[string]interface{}) {
 	initRoute(engine, config)
 
 	engine.Use(QRecovery(func(c *gin.Context, err interface{}) {
-		c.String(500, qref.StackStringErr(err, 0))
+		c.String(500, qerr.StackString(util.AsStr(err, ""), 0, 1024))
 	}))
 
 	go func() {
@@ -88,7 +88,7 @@ var upgrader = &websocket.Upgrader{}
 func wsconnect(context *gin.Context) {
 	var conn, err = upgrader.Upgrade(context.Writer, context.Request, nil)
 	if err != nil {
-		context.String(500, qref.StackStringErr(err, 0))
+		context.String(500, qerr.StackString(err.Error(), 0, 1024))
 		return
 	}
 	go wsread(conn)
@@ -118,7 +118,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 	var consume int64
 	var action string
 	var name string
-	var cut *qref.StackCut
+	var cut *qerr.StackCut
 	var result interface{} = "handler not found"
 	var response = map[string]interface{}{}
 
@@ -134,7 +134,7 @@ func wshandle(data []byte) (err error, ret []byte) {
 		if err != nil {
 			result = action + " @ " + name + "\n"
 			if cut == nil {
-				cut = qref.StackCutting(1)
+				cut = qerr.StackCutting(1, 1024)
 			}
 			result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v\n%v", action, name, err.Error(), cut.File, cut.Line, cut.Func, string(cut.Stack))
 			//result = fmt.Sprintf("%v @ %v \n%v \n%v:%v %v", action, name, err.Error(), cut.File, cut.Line, cut.Func)
