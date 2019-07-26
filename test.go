@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
-	"github.com/camsiabor/qcom/qerr"
 	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/impl/etcd"
 	"github.com/camsiabor/qservice/impl/httpq"
@@ -60,22 +59,6 @@ func test() {
 }
 
 func main() {
-
-	var cut *qerr.StackCut
-	func() {
-		func() {
-			func() {
-				cut = qerr.StackCutting(0, 99)
-			}()
-		}()
-	}()
-
-	fmt.Printf("%v %v : %v\n", cut.File, cut.Func, cut.Line)
-	fmt.Println(string(cut.Stack))
-
-	if 1 == 1 {
-		return
-	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 

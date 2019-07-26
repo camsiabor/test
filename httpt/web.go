@@ -50,7 +50,7 @@ func InitWeb(config map[string]interface{}) {
 	initRoute(engine, config)
 
 	engine.Use(QRecovery(func(c *gin.Context, err interface{}) {
-		c.String(500, qerr.StackString(util.AsStr(err, ""), 0, 1024))
+		c.String(500, qerr.StackString(0, 1024, util.AsStr(err, "")))
 	}))
 
 	go func() {
@@ -88,7 +88,7 @@ var upgrader = &websocket.Upgrader{}
 func wsconnect(context *gin.Context) {
 	var conn, err = upgrader.Upgrade(context.Writer, context.Request, nil)
 	if err != nil {
-		context.String(500, qerr.StackString(err.Error(), 0, 1024))
+		context.String(500, qerr.StackString(0, 1024, err.Error()))
 		return
 	}
 	go wsread(conn)
