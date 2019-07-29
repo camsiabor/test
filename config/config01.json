@@ -17,8 +17,10 @@
       "test.ank" : { }
     }
   },
+
   "gateways": {
     "zk": {
+      "active" : false,
       "type": "zookeeper",
       "endpoints": [
         "127.0.0.1:12181"
@@ -26,7 +28,9 @@
       "session.timeout": 10
     },
     "ws": {
+      "verbose" : 1,
       "type": "websocket",
+      "port" : 20001,
       "endpoints": [
         "ws://127.0.0.1:20001"
       ],
@@ -36,8 +40,14 @@
 
   "discovery" : {
     "type" : "zookeeper",
+    "type.mem" : "memory",
     "endpoints" : [ "127.0.0.1:12181" ],
+    "remote.as.local" : false,
     "session.timeout" : 10
+  },
+
+  "microroller" : {
+    "verbose" : 1
   },
 
   "http" : {
