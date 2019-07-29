@@ -33,6 +33,10 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 			return
 		}
 
+		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.err", 0, nil, func(message *qtiny.Message) {
+			_ = message.Error(500, "i am wrong")
+		}))
+
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.conn", 0, nil, func(message *qtiny.Message) {
 			var _, id, endpoint, _ = zkGetParams(message)
 			var _, err = ZooWatcherGet(id, endpoint)
