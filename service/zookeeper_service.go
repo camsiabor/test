@@ -22,7 +22,7 @@ func zkGetParams(message *qtiny.Message) (request map[string]interface{}, id str
 	return
 }
 
-func ZookeeperTiny() *qtiny.TinyGuide {
+func ZookeeperTinyGuide() *qtiny.TinyGuide {
 
 	var guide = &qtiny.TinyGuide{}
 
@@ -32,10 +32,6 @@ func ZookeeperTiny() *qtiny.TinyGuide {
 			log.Printf("zookeeper tiny guide start error %v", err)
 			return
 		}
-
-		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.err", 0, nil, func(message *qtiny.Message) {
-			_ = message.Error(500, "i am wrong")
-		}))
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.zk.conn", 0, nil, func(message *qtiny.Message) {
 			var _, id, endpoint, _ = zkGetParams(message)

@@ -14,7 +14,7 @@ func etcdGetParams(message *qtiny.Message) (request map[string]interface{}, id s
 	return
 }
 
-func EtcdTiny() *qtiny.TinyGuide {
+func EtcdTinyGuide() *qtiny.TinyGuide {
 
 	var guide = &qtiny.TinyGuide{}
 

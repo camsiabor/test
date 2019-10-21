@@ -137,21 +137,28 @@ func initTina(config map[string]interface{}) *qtiny.Tina {
 }
 
 func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
-	var zkguide = service.ZookeeperTiny()
-	var future = tina.Deploy("zookeeper", zkguide, config, 0, nil)
-	go future.Run()
+
+	// simple guide
+	var simpleGuide = service.SimpleTinyGuide()
+	var simpleGuideFuture = tina.Deploy("simple", simpleGuide, config, 0, nil)
+	go simpleGuideFuture.Run()
+
+	// zoo keeper guide
+	var zkGuide = service.ZookeeperTinyGuide()
+	var zkGuideFuture = tina.Deploy("zookeeper", zkGuide, config, 0, nil)
+	go zkGuideFuture.Run()
 
 	var luaConfig = util.GetMap(config, true, "lua")
 
 	for k, v := range luaConfig {
 		var configPath = util.AsStr(v, "")
 		var guide = luatiny.NewLuaTinyGuide(k, configPath)
-		future = tina.Deploy("luatiny."+k+"."+configPath, guide, nil, 0, nil)
-		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
+		zkGuideFuture = tina.Deploy("luatiny."+k+"."+configPath, guide, nil, 0, nil)
+		zkGuideFuture.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
 			log.Printf("deploy lua tiny %v fail : %v %v", k, configPath, future.ErrCause())
 			return 0
 		})
-		go future.Run()
+		go zkGuideFuture.Run()
 	}
 
 	var ankoConfig = util.GetMap(config, true, "anko")
@@ -160,12 +167,12 @@ func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
 	for ankoMain, ankoConfigOne := range ankoTinys {
 		var tinyConfig = util.AsMap(ankoConfigOne, true)
 		var guide = ankotiny.NewAnkoTinyGuide(ankoPath, ankoMain)
-		future = tina.Deploy("ankotiny."+ankoMain, guide, tinyConfig, 0, nil)
-		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
+		zkGuideFuture = tina.Deploy("ankotiny."+ankoMain, guide, tinyConfig, 0, nil)
+		zkGuideFuture.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
 			log.Printf("deploy anko tiny %v fail : %v", ankoMain, future.ErrCause())
 			return 0
 		})
-		go future.Run()
+		go zkGuideFuture.Run()
 	}
 
 }
