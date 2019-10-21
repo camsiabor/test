@@ -10,8 +10,6 @@ import (
 	"github.com/camsiabor/qservice/qtiny"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/mattn/anko/packages"
-	"github.com/mattn/anko/vm"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -230,11 +228,15 @@ func call(address string, data interface{}, gatekey string, timeout int64, flag 
 }
 
 func exec(scriptType string, script string, name string, params interface{}) (interface{}, error) {
-	var env = vm.NewEnv()
-	_ = env.Define("params", params)
-	packages.DefineImport(env)
-	env.SetName(name)
-	return env.Execute(script)
+	/*
+		var env = vm.NewEnv()
+		_ = env.Define("params", params)
+		packages.DefineImport(env)
+		env.SetName(name)
+		return env.Execute(script)
+
+	*/
+	panic("not implement")
 }
 
 func callp(context *gin.Context) {
