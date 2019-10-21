@@ -7,7 +7,6 @@ import (
 	//"github.com/camsiabor/qservice/impl/etcd"
 	"github.com/camsiabor/qservice/impl/httpq"
 	"github.com/camsiabor/qservice/impl/memory"
-	"github.com/camsiabor/qservice/impl/tiny/ankotiny"
 	"github.com/camsiabor/qservice/impl/tiny/luatiny"
 	"github.com/camsiabor/qservice/impl/zookeeper"
 	"github.com/camsiabor/qservice/qtiny"
@@ -161,19 +160,21 @@ func initTinys(tina *qtiny.Tina, config map[string]interface{}) {
 		go future.Run()
 	}
 
-	var ankoConfig = util.GetMap(config, true, "anko")
-	var ankoPath = util.GetStr(ankoConfig, "../../src/github.com/camsiabor/test/anko", "path")
-	var ankoTinys = util.GetMap(ankoConfig, true, "tinys")
-	for ankoMain, ankoConfigOne := range ankoTinys {
-		var tinyConfig = util.AsMap(ankoConfigOne, true)
-		var guide = ankotiny.NewAnkoTinyGuide(ankoPath, ankoMain)
-		var future = tina.Deploy("ankotiny."+ankoMain, guide, tinyConfig, 0, nil)
-		future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
-			log.Printf("deploy anko tiny %v fail : %v", ankoMain, future.ErrCause())
-			return 0
-		})
-		go future.Run()
-	}
+	/*
+		var ankoConfig = util.GetMap(config, true, "anko")
+		var ankoPath = util.GetStr(ankoConfig, "../../src/github.com/camsiabor/test/anko", "path")
+		var ankoTinys = util.GetMap(ankoConfig, true, "tinys")
+		for ankoMain, ankoConfigOne := range ankoTinys {
+			var tinyConfig = util.AsMap(ankoConfigOne, true)
+			var guide = ankotiny.NewAnkoTinyGuide(ankoPath, ankoMain)
+			var future = tina.Deploy("ankotiny."+ankoMain, guide, tinyConfig, 0, nil)
+			future.OnFail(func(event qtiny.FutureEvent, future *qtiny.Future) qtiny.FutureCallbackReturn {
+				log.Printf("deploy anko tiny %v fail : %v", ankoMain, future.ErrCause())
+				return 0
+			})
+			go future.Run()
+		}
+	*/
 
 }
 
