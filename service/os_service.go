@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/camsiabor/qcom/util"
 	"github.com/camsiabor/qservice/qtiny"
 	"log"
 	"os"
@@ -19,15 +20,29 @@ func OsTinyGuide() *qtiny.TinyGuide {
 		}
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.os.exec", 0, nil, func(message *qtiny.Message) {
-			_ = message.Error(500, "i am wrong")
 
-			cmd := exec.Command("prog")
+			var data = util.AsMap(message.Data, false)
+			var cmdline = util.GetStr(data, "", "cmd")
+			if len(cmdline) == 0 {
+				_ = message.Error(500, "no command line")
+				return
+			}
+			var cmd = exec.Command(cmdline)
 			cmd.Env = append(os.Environ(),
 				"FOO=duplicate_value", // ignored
 				"FOO=actual_value",    // this value is used
 			)
-			if err := cmd.Run(); err != nil {
-				log.Fatal(err)
+			var sync = util.GetBool(data, false, "sync")
+			var err error
+			if sync {
+				err = cmd.Run()
+			} else {
+				err = cmd.Start()
+			}
+			if err == nil {
+				_ = message.Reply(0, "[success] "+cmdline)
+			} else {
+				_ = message.Error(500, "[fail] "+cmdline+" | "+err.Error())
 			}
 
 		}))
