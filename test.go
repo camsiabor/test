@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/camsiabor/qcom/qconfig"
 	"github.com/camsiabor/qcom/util"
-	"github.com/camsiabor/qservice/impl/etcd"
+	//"github.com/camsiabor/qservice/impl/etcd"
 	"github.com/camsiabor/qservice/impl/httpq"
 	"github.com/camsiabor/qservice/impl/memory"
 	"github.com/camsiabor/qservice/impl/tiny/ankotiny"
@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-func test() {
+func _() {
 	client, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"127.0.0.1:2379"},
 		DialTimeout: time.Duration(10) * time.Second,
@@ -85,7 +85,8 @@ func generateGateway(gatewayType string) qtiny.Gateway {
 	if strings.Contains(gatewayType, "zoo") {
 		return &zookeeper.ZooGateway{}
 	} else if strings.Contains(gatewayType, "etcd") {
-		return &etcd.EtcdGateway{}
+		panic("etcd not support")
+		//return &etcd.EtcdGateway{}
 	} else if strings.Contains(gatewayType, "websocket") {
 		return &httpq.WebsocketGateway{}
 	} else if strings.Contains(gatewayType, "memory") {
