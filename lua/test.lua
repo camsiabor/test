@@ -9,6 +9,14 @@ qtiny.NanoLocalRegister({
 })
 
 qtiny.NanoLocalRegister({
+    Address = "qam.lua.test2",
+    Handler = function(msg)
+        tina.GetLogger().Println("test!")
+        qtiny.MessageReply(msg, 0, "test " .. nodeId)
+    end
+})
+
+qtiny.NanoLocalRegister({
     Address = "qam.lua.power",
     Handler = function(msg)
         qtiny.MessageReply(msg, 0, "power over whelming " .. nodeId)
