@@ -17,7 +17,7 @@ func SimpleTinyGuide() *qtiny.TinyGuide {
 		}
 
 		_ = tiny.NanoLocalRegister(qtiny.NewNano("qam.err", 0, nil, func(message *qtiny.Message) {
-			_ = message.Error(500, "i am wrong")
+			_ = message.Error(500, "i am wrong. node "+tiny.GetTina().GetNodeId())
 		}))
 	}
 

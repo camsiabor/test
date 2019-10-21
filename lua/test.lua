@@ -17,9 +17,9 @@ qtiny.NanoLocalRegister({
 })
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.power",
+    Address = "qam.lua.err",
     Handler = function(msg)
-        qtiny.MessageReply(msg, 0, "power over whelming " .. nodeId)
+        qtiny.MessageError(msg, 0, "power over whelming " .. nodeId)
     end
 })
 
