@@ -222,22 +222,21 @@ func exec(scriptType string, script string, name string, params interface{}) (in
 	panic("not implement")
 }
 
-func call(address string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (*qtiny.Message, error) {
+func call(address string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (string, error) {
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
 	request.LocalFlag = flag
 
-	var err error
-	var response *qtiny.Message
 	var microroller = tina.GetMicroroller()
-	response, err = microroller.Post(gatekey, request)
+	var response, err = microroller.Post(gatekey, request)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if response.IsError() {
-		return response, util.AsError(response.ReplyErr)
+		return "", fmt.Errorf("[%v]\n\n%v\n\n%v", response.Sender, response.ReplyErr, response.ReplyTrace)
+	} else {
+		return fmt.Sprintf("[%v]\n\n%v", response.Sender, response.ReplyData), nil
 	}
-	return response, nil
 }
 
 func callp(context *gin.Context) {
@@ -255,18 +254,11 @@ func callp(context *gin.Context) {
 	if remote {
 		flag = flag | qtiny.MessageFlagRemoteOnly
 	}
-	var response, err = call(address, data, gatekey, timeout, flag)
-	if err != nil {
-		var reply string
-		if response == nil {
-			reply = fmt.Sprintf("%v", err)
-		} else {
-			reply = fmt.Sprintf("[%v]\n\n%v\n\n%v", response.Sender, response.ReplyErr, response.ReplyTrace)
-		}
-		context.String(500, reply)
-		return
-	}
-	var reply = fmt.Sprintf("[%v]\n\n%v", response.Sender, response.ReplyData)
-	context.String(200, reply)
 
+	var reply, err = call(address, data, gatekey, timeout, flag)
+	if err == nil {
+		context.String(200, reply)
+	} else {
+		context.String(500, err.Error())
+	}
 }
