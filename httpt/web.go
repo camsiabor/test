@@ -217,7 +217,8 @@ func call(address string, data interface{}, gatekey string, timeout int64, flag 
 
 	var err error
 	var response *qtiny.Message
-	response, err = tina.GetMicroroller().Post(gatekey, request)
+	var microroller = tina.GetMicroroller()
+	response, err = microroller.Post(gatekey, request)
 	if err != nil {
 		return nil, err
 	}
