@@ -25,16 +25,25 @@ let config_def = {
         params: JSON.stringify({
             'hello': 'world',
             'oops': 'O_O!',
-            'doc': 'click button call to invoke vertx.eventbus.send()'
+            'doc': 'request params'
         }, null, '  '),
+
         script: '// click button exec to run lua script; \n return "hello world from lua" + oops;',
+
         timeout: 30,
         gatekey: "",
+
+        node: "",
+        node_map: {},
+        node_list: [],
+
         method_map: {},
         method_list: [],
         method_list_limit: 256,
+
         pretty_limit: 1024,
         record_limit: 12,
+
         request_json_depth: 2,
         response_json_depth: 2,
         response_json_pretty: true
@@ -375,7 +384,7 @@ let methods = {
         }.bind(this), this.config.socket.reconnect * 1000);
     },
 
-    select(method) {
+    select_method(method) {
 
         if (method) {
             this.config.call.method = method;
@@ -411,21 +420,67 @@ let methods = {
         this.config.call.method_list = new_list;
     },
 
-    record(type) {
-        let method = this.config.call.method;
-        let method_list = this.config.call.method_list;
-        let new_list = [method];
-        for (let i = 0; i < method_list.length && i < this.config.call.method_list_limit; i++) {
-            let one = method_list[i];
-            if (one !== method) {
+    select_node(node) {
+
+        if (node) {
+            this.config.call.node = node;
+        } else {
+            node = this.config.call.node;
+        }
+        // this.$refs.call_node_typeahead.inputValue = node;
+        if (!this.config.call.node_map) {
+            this.config.call.node_map = {};
+        }
+        /*
+        let box = this.config.call.node_map[node];
+        if (typeof box === 'string') {
+            box = { node : node };
+        }
+         */
+    },
+
+    node_list_delete_item(node) {
+        this.config.call.node_map[node] = null;
+        let node_list = this.config.call.node_list;
+        let new_list = [];
+        for (let i = 0; i < node_list.length; ++i) {
+            let one = node_list[i];
+            if (one !== node) {
                 new_list.push(one);
             }
         }
-        this.config.call.method_list = new_list;
+        this.config.call.node_list = new_list;
+    },
+
+    record(type) {
+        let method = this.config.call.method;
+        let method_list = this.config.call.method_list;
+        let method_list_new = [method];
+        for (let i = 0; i < method_list.length && i < this.config.call.method_list_limit; i++) {
+            let one = method_list[i];
+            if (one !== method) {
+                method_list_new.push(one);
+            }
+        }
+        this.config.call.method_list = method_list_new;
         this.config.call.method_map[method] = {
             type: type,
             params: this.config.call.params,
             script: this.config.call.script
+        };
+
+        let node = this.config.call.node;
+        let node_list = this.config.call.node_list;
+        let node_list_new = [node];
+        for (let i = 0; i < node_list.length && i < this.config.call.node_list_limit; i++) {
+            let one = node_list[i];
+            if (one !== node) {
+                node_list_new.push(one);
+            }
+        }
+        this.config.call.node_list = node_list_new;
+        this.config.call.node_map = {
+            node: node
         };
     },
 
@@ -678,8 +733,10 @@ window.vue = new Vue({
     mounted: function () {
         this.config_load();
         this.editor_init();
+        this.$refs.call_node_typeahead.inputValue = this.config.call.node;
         this.$refs.call_method_typeahead.inputValue = this.config.call.method;
-        this.select(this.config.call.method);
+        this.select_node(this.config.call.node);
+        this.select_method(this.config.call.method);
         this.connect();
     }
 });

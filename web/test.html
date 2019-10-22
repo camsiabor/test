@@ -53,16 +53,6 @@
 
         <div class="input-group">
 
-
-            <button type="button" class="btn btn-outline-warning dropdown-toggle dropdown-toggle-split"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="sr-only">type</span>
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="#" v-on:click="reconnect('test')">test</a>
-                <a class="dropdown-item" href="#" v-on:click="reconnect('platform')">platform</a>
-            </div>
-
             <vue-bootstrap-typeahead
                     style="width: 90%;"
                     ref="call_method_typeahead"
@@ -70,7 +60,7 @@
                     v-model="config.call.method"
                     :data="config.call.method_list"
                     minMatchingChars="1"
-                    @hit="select"
+                    @hit="select_method"
             >
                 <template slot="append">
                     <button type="button" class="btn btn-outline-info" @click="exec" v-if="type() === TEST">exec
@@ -92,7 +82,7 @@
                             <button type="button"
                                     class="btn btn-sm  btn-outline-secondary"
                                     style="width: 90%; font-size: 0.75em; border: none; "
-                                    v-on:click="select(method, $event);"
+                                    v-on:click="select_method(method, $event);"
                             >{{method}}
                             </button>
                             <button type="button"
@@ -145,11 +135,58 @@
 
 <div class="row">
 <div class="col-4">
+
+    <!-- node list -->
+    <div class="row">
+        <div class="col-12">
+
+            <vue-bootstrap-typeahead
+                    style="width: 90%;"
+                    ref="call_node_typeahead"
+                    :input="config.call.node"
+                    v-model="config.call.node"
+                    :data="config.call.node_list"
+                    minMatchingChars="1"
+                    @hit="select_node"
+            >
+                <template slot="append">
+                    <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu" style="width: 66%">
+
+                        <div v-for="node in config.call.node_list">
+                            <!--
+                  <a class="dropdown-item" href="#"  v-on:click="select(method, $event);" style="font-size: 0.75em;">{{method}}</a>
+                  -->
+                            <button type="button"
+                                    class="btn btn-sm  btn-outline-secondary"
+                                    style="width: 90%; font-size: 0.75em; border: none; "
+                                    v-on:click="select_node(node, $event);"
+                            >{{node}}
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm  btn-outline-danger"
+                                    v-on:click="node_list_delete_item(node, $event);"
+                                    style="width: 8%; font-size: 0.75em; border: none;">x
+                            </button>
+                        </div>
+
+                    </div>
+                </template>
+            </vue-bootstrap-typeahead>
+        </div>
+    </div>
+
+    <!-- call params -->
     <div class="row">
         <div class="col-12" style="border: 1px solid rgb(172, 172, 172); border-radius: 5px;">
             <pre id="editor_params" v-bind:style="{ width: '100%', height: 300 + 'px' }"><textarea></textarea></pre>
         </div>
     </div>
+
+    <!-- script -->
     <div class="row" style="margin-top: 5px;">
         <div class="col-12" style="border: 1px solid rgb(172, 172, 172); border-radius: 5px;">
             <pre id="editor_script" v-bind:style="{ width: '100%', height: 300 + 'px' }"><textarea></textarea></pre>
@@ -255,18 +292,6 @@
                             <input type="text" class="form-control" v-model="config.socket.reconnect">
                         </div>
                         <div class="form-group">
-                            <label class="col-form-label">username</label>
-                            <input type="text" class="form-control" v-model="config.game.username">
-                        </div>
-                        <div class="form-group">
-                            <label class="col-form-label">password</label>
-                            <input type="text" class="form-control" v-model="config.game.password">
-                        </div>
-                        <div class="form-group">
-                            <label class="col-form-label">operator_id</label>
-                            <input type="text" class="form-control" v-model="config.game.operator_id">
-                        </div>
-                        <div class="form-group">
                             <label class="col-form-label">id</label>
                             <input type="text" class="form-control" v-model="config.game.id">
                         </div>
@@ -280,43 +305,6 @@
         </div>
     </div>
 
-
-    <div class="modal fade" id="modal_config_game" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">config game parameters</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label class="col-form-label">type</label>
-                            <input type="text" class="form-control" v-model="config.game.type">
-                        </div>
-                        <div class="form-group">
-                            <label class="col-form-label">bet_multiplier</label>
-                            <input type="text" class="form-control" v-model="config.game.bet_multiplier">
-                        </div>
-                        <div class="form-group">
-                            <label class="col-form-label">emulation</label>
-                            <textarea class="form-control" v-model="config.game.emulation"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-form-label">progressive_magnifier</label>
-                            <input type="input" class="form-control" v-model="config.game.progressive_magnifier">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
-                    <button type="button" class="btn btn-primary" v-on:click="config_save(true)">save</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="modal fade" id="modal_config_call" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
