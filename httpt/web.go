@@ -172,7 +172,8 @@ func wshandle(data []byte) (err error, ret []byte) {
 			action = util.GetStr(request, "", "action")
 			if action == "call" {
 				code = 200
-				var address = util.GetStr(request, "", "method")
+				var node = util.GetStr(request, "", "node")
+				var method = util.GetStr(request, "", "method")
 				var params = util.GetMap(request, false, "params")
 				var local = util.GetBool(request, false, "local")
 				var remote = util.GetBool(request, false, "remote")
@@ -184,8 +185,8 @@ func wshandle(data []byte) (err error, ret []byte) {
 				if remote {
 					flag = flag | qtiny.MessageFlagRemoteOnly
 				}
-				name = address
-				result, err = call(address, params, gatekey, timeout, flag)
+				name = method
+				result, err = call(node, method, params, gatekey, timeout, flag)
 			} else if action == "script" {
 				var script = util.GetStr(request, "", "script")
 				var scriptType = util.GetStr(request, "anko", "type")
@@ -222,9 +223,10 @@ func exec(scriptType string, script string, name string, params interface{}) (in
 	panic("not implement")
 }
 
-func call(address string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (string, error) {
+func call(node string, method string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (string, error) {
 	var tina = qtiny.GetTina()
-	var request = qtiny.NewMessage(address, data, time.Duration(timeout)*time.Millisecond)
+	var request = qtiny.NewMessage(method, data, time.Duration(timeout)*time.Millisecond)
+	request.Receiver = node
 	request.LocalFlag = flag
 
 	var microroller = tina.GetMicroroller()
@@ -241,7 +243,8 @@ func call(address string, data interface{}, gatekey string, timeout int64, flag 
 
 func callp(context *gin.Context) {
 	var data = context.Query("data")
-	var address = context.Query("address")
+	var node = context.Query("node")
+	var method = context.Query("address")
 	var gatekey = context.Query("gatekey")
 	var timeout = util.AsInt64(context.Query("timeout"), 15000)
 	var local = util.AsBool(context.Query("local"), false)
@@ -255,7 +258,7 @@ func callp(context *gin.Context) {
 		flag = flag | qtiny.MessageFlagRemoteOnly
 	}
 
-	var reply, err = call(address, data, gatekey, timeout, flag)
+	var reply, err = call(node, method, data, gatekey, timeout, flag)
 	if err == nil {
 		context.String(200, reply)
 	} else {
