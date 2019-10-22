@@ -33,9 +33,9 @@ let config_def = {
         timeout: 30,
         gatekey: "",
 
-        node: "",
         node_map: {},
         node_list: [],
+        node_list_limit: 32,
 
         method_map: {},
         method_list: [],
@@ -427,7 +427,7 @@ let methods = {
         } else {
             node = this.config.call.node;
         }
-        // this.$refs.call_node_typeahead.inputValue = node;
+        this.$refs.call_node_typeahead.inputValue = node;
         if (!this.config.call.node_map) {
             this.config.call.node_map = {};
         }
@@ -506,6 +506,7 @@ let methods = {
     call(extra) {
 
         let params = this.get_call_params();
+        let node = this.config.call.node;
         let method = this.config.call.method;
         let gatekey = this.config.call.gatekey;
 
@@ -514,6 +515,7 @@ let methods = {
 
         let packet = {
             action: 'call',
+            node: node,
             method: method,
             params: params,
             gatekey: gatekey,
