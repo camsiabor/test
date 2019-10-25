@@ -1,3 +1,5 @@
+local json = require "util.json"
+
 local nodeId = tina.GetNodeId()
 
 qtiny.NanoLocalRegister({
@@ -8,6 +10,10 @@ qtiny.NanoLocalRegister({
         qtiny.MsgEasy(msg)
 
         tina.GetLogger().Println(theM.Data)
+
+        local data = json.decode(theM.Data)
+        local str = json.encode(data)
+        tina.GetLogger().Println("finally " .. str)
 
         qtiny.MsgReply(msg, 0, "test " .. nodeId)
     end
