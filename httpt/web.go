@@ -224,6 +224,14 @@ func exec(scriptType string, script string, name string, params interface{}) (in
 }
 
 func call(node string, method string, data interface{}, gatekey string, timeout int64, flag qtiny.MessageFlag) (string, error) {
+
+	if data != nil {
+		var bytes, err = json.Marshal(data)
+		if err == nil {
+			data = string(bytes)
+		}
+	}
+
 	var tina = qtiny.GetTina()
 	var request = qtiny.NewMessage(method, data, time.Duration(timeout)*time.Millisecond)
 	request.Receiver = node

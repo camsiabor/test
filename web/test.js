@@ -253,7 +253,9 @@ let methods = {
 
             if (r && typeof r === 'string') {
                 r = r.trim();
-                if (r.charAt(0) === '{' || r.charAt(0) === '[') {
+                let rlen = r.length;
+                if ((r.charAt(0) === '{' && r.charAt(rlen - 1) === '}')
+                    || (r.charAt(0) === '[' && r.charAt(rlen - 1) === ']')) {
                     try {
                         r = JSON.parse(r);
                         target.response.result = r;
