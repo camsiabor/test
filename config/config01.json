@@ -1,7 +1,5 @@
 {
-
-
-  "id" : "node01",
+  "id": "win.01",
 
   "logger" : {
 
@@ -28,11 +26,11 @@
       "session.timeout": 10
     },
     "ws": {
-      "verbose" : 1,
+      "verbose": 5,
       "type": "websocket",
       "port" : 20001,
       "endpoints": [
-        "ws://127.0.0.1:20001"
+        "ws://10.1.2.101:20001"
       ],
       "session.timeout": 10
     }
@@ -47,7 +45,7 @@
   },
 
   "microroller" : {
-    "verbose" : 1
+    "verbose": 5
   },
 
   "http" : {
