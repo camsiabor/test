@@ -15,10 +15,13 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.test2",
     Handler = function(msg)
-
-        qmsg.New({ Address = "qam.lua.try" })
-
-        qmsg.Reply(msg, 0, nodeId)
+        local request = qmsg.NewSimple({ Address = "qam.lua.try" })
+        local response, err = qtiny.Post("", request)
+        if err == nil then
+            qmsg.Reply(msg, 0, qmsg.Data(response))
+        else
+            qmsg.Error(msg, 500, err)
+        end
     end
 })
 
