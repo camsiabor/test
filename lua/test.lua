@@ -22,6 +22,19 @@ qtiny.NanoLocalRegister({
     end
 })
 
+qtiny.NanoLocalRegister({
+    Address = "qam.lua.try",
+    Handler = function(msg)
+        local reply = "trying " .. nodeId .. " | "
+        local datastr = qmsg.Data(msg)
+        if datastr ~= nil then
+            local data = json.decode(datastr)
+            reply = reply .. " " .. data["hello"]
+        end
+        qmsg.Reply(msg, 0, reply)
+    end
+})
+
 qtiny.AddCloseHandler(function ()
     tina.GetLogger().Println("i am close!")
 end)
