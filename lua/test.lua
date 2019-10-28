@@ -6,12 +6,19 @@ qtiny.NanoLocalRegister({
     Address = "qam.lua.test",
     Handler = function(msg)
         tina.GetLogger().Println("test!")
+        --qmsg.Easy(msg)
+        --local data = json.decode(theM.Data)
+        qmsg.Reply(msg, 0, nodeId)
+    end
+})
 
-        qmsg.Easy(msg)
+qtiny.NanoLocalRegister({
+    Address = "qam.lua.test2",
+    Handler = function(msg)
 
-        local data = json.decode(theM.Data)
+        qmsg.New({ Address = "qam.lua.try" })
 
-        qmsg.Reply(msg, 0, data["hello"] .. " " .. nodeId)
+        qmsg.Reply(msg, 0, nodeId)
     end
 })
 
