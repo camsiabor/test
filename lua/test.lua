@@ -8,7 +8,7 @@ qtiny.NanoLocalRegister({
         tina.GetLogger().Println("test!")
         --qmsg.Easy(msg)
         --local data = json.decode(theM.Data)
-        qmsg.Reply(msg, 0, nodeId)
+        qmsg.Reply(msg, 0, nodeId .. " | " .. luaunit.index)
     end
 })
 
@@ -27,8 +27,8 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.sleep",
     Handler = function(msg)
-        qos.Sleep(3000)
-        qmsg.Reply(msg, 0, "sleep!")
+        qos.Sleep(2000)
+        qmsg.Reply(msg, 0, "sleep! " .. luaunit.index)
     end
 })
 
