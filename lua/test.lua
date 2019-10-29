@@ -17,10 +17,18 @@ qtiny.NanoLocalRegister({
     Handler = function(msg)
         local response, err = qmsg.Post({ Address = "qam.lua.try" })
         if err == nil then
-            qmsg.Reply(msg, 0, "try called!")
+            qmsg.Reply(msg, 0, "try called !!!!!!!!")
         else
             qmsg.Error(msg, 500, err)
         end
+    end
+})
+
+qtiny.NanoLocalRegister({
+    Address = "qam.lua.sleep",
+    Handler = function(msg)
+        qos.Sleep(3000)
+        qmsg.Reply(msg, 0, "sleep!")
     end
 })
 
