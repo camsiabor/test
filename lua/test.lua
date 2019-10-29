@@ -15,10 +15,9 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.test2",
     Handler = function(msg)
-        local request = qmsg.NewSimple({ Address = "qam.lua.try" })
-        local response, err = qtiny.Post("", request)
+        local response, err = qmsg.Post({ Address = "qam.lua.try" })
         if err == nil then
-            qmsg.Reply(msg, 0, qmsg.Data(response))
+            qmsg.Reply(msg, 0, "try called!")
         else
             qmsg.Error(msg, 500, err)
         end
@@ -35,6 +34,7 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "qam.lua.try",
     Handler = function(msg)
+        tina.GetLogger().Println("i am trying!!!!!!")
         local reply = "trying " .. nodeId .. " | "
         local datastr = qmsg.Data(msg)
         if datastr ~= nil then
