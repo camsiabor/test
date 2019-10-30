@@ -24,6 +24,22 @@ qtiny.NanoLocalRegister({
     end
 })
 
+local outer = 100
+
+qtiny.NanoLocalRegister({
+    Address = "qam.lua.loop",
+    Handler = function(msg)
+        local sum = 0
+        for i = 1, 20000 do
+            for j = 1, 20000 do
+                sum = sum + 1
+            end
+        end
+        outer = outer + 100
+        qmsg.Reply(msg, 0, "looping! " .. outer)
+    end
+})
+
 qtiny.NanoLocalRegister({
     Address = "qam.lua.sleep",
     Handler = function(msg)
