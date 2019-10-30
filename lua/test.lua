@@ -13,7 +13,7 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "test.lua.call",
     Handler = function(msg)
-        local response, err = qmsg.Post({ Address = "qam.lua.try2" })
+        local response, err = qmsg.Post({ Address = "test.try2" })
         if err == nil then
             qmsg.Reply(msg, 0, "try called !!!!!!!!" .. qmsg.ReplyData(response))
         else
@@ -63,6 +63,7 @@ qtiny.NanoLocalRegister({
             local data = json.decode(datastr)
             reply = reply .. " " .. data["hello"]
         end
+        qos.Sleep(500)
         qmsg.Reply(msg, 0, reply)
     end
 })
