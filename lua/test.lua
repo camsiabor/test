@@ -13,7 +13,7 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "test.lua.call",
     Handler = function(msg)
-        local response, err = qmsg.Post({ Address = "test.try2" })
+        local response, err = qmsg.Post({ Address = "test.try" })
         if err == nil then
             qmsg.Reply(msg, 0, "try called !!!!!!!!" .. qmsg.ReplyData(response))
         else
@@ -67,6 +67,15 @@ qtiny.NanoLocalRegister({
         qmsg.Reply(msg, 0, reply)
     end
 })
+
+qtiny.NanoLocalRegister({
+    Address = "test.redis",
+    Handler = function(msg)
+        qmsg.Reply()
+    end
+})
+
+
 
 qtiny.AddCloseHandler(function ()
     tina.GetLogger().Println("i am close!")
