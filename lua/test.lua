@@ -3,21 +3,19 @@ local json = require "util.json"
 local nodeId = tina.GetNodeId()
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.test",
+    Address = "test",
     Handler = function(msg)
         tina.GetLogger().Println("test!")
-        --qmsg.Easy(msg)
-        --local data = json.decode(theM.Data)
-        qmsg.Reply(msg, 0, nodeId .. " | " .. luaunit.index)
+        qmsg.Reply(msg, 0, "test! | " .. nodeId)
     end
 })
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.test2",
+    Address = "test.lua.call",
     Handler = function(msg)
-        local response, err = qmsg.Post({ Address = "qam.lua.try" })
+        local response, err = qmsg.Post({ Address = "qam.lua.try2" })
         if err == nil then
-            qmsg.Reply(msg, 0, "try called !!!!!!!!")
+            qmsg.Reply(msg, 0, "try called !!!!!!!!" .. qmsg.ReplyData(response))
         else
             qmsg.Error(msg, 500, err)
         end
@@ -27,7 +25,7 @@ qtiny.NanoLocalRegister({
 local outer = 100
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.loop",
+    Address = "test.loop",
     Handler = function(msg)
         local sum = 0
         for i = 1, 10000 do
@@ -41,7 +39,7 @@ qtiny.NanoLocalRegister({
 })
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.sleep",
+    Address = "test.sleep",
     Handler = function(msg)
         qos.Sleep(2000)
         qmsg.Reply(msg, 0, "sleep! ")
@@ -49,14 +47,14 @@ qtiny.NanoLocalRegister({
 })
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.err",
+    Address = "test.err",
     Handler = function(msg)
         qmsg.Error(msg, 0, "testing error " .. nodeId)
     end
 })
 
 qtiny.NanoLocalRegister({
-    Address = "qam.lua.try",
+    Address = "test.try",
     Handler = function(msg)
         tina.GetLogger().Println("i am trying!!!!!!")
         local reply = "trying " .. nodeId .. " | "
