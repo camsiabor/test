@@ -1,11 +1,12 @@
 local json = require "util.json"
 
-local nodeId = tina.GetNodeId()
+local logger = qam.tina.GetLogger()
+local nodeId = qam.tina.GetNodeId()
 
 qtiny.NanoLocalRegister({
     Address = "test",
     Handler = function(msg)
-        tina.GetLogger().Println("test!")
+        logger.Println("test!")
         qmsg.Reply(msg, 0, "test! | " .. nodeId)
     end
 })
@@ -56,7 +57,7 @@ qtiny.NanoLocalRegister({
 qtiny.NanoLocalRegister({
     Address = "test.try",
     Handler = function(msg)
-        tina.GetLogger().Println("i am trying!!!!!!")
+        logger.Println("i am trying!!!!!!")
         local reply = "trying " .. nodeId .. " | "
         local datastr = qmsg.Data(msg)
         if datastr ~= nil then
@@ -79,13 +80,17 @@ qtiny.NanoLocalRegister({
     Address = "test.pcall",
     Handler = function(msg)
 
-        local ret, a, b, c = pcall(function()
-            return "power", "over", "whelming" .. x
+        xpcall(function()
+            error("here?")
+        end, debug.stacktrace)
+
+        local ok, a, b, c = pcall(function()
+            return "power", "over", "whelming"
         end)
-        if ret == "true" then
+        if ok then
             qmsg.Reply(msg, 0, "pcall! " .. a .. " | " .. b .. " | " .. c)
         else
-            qmsg.Error(msg, 500, "pcall! " .. ret)
+            qmsg.Error(msg, 500, "pcall! " .. a)
         end
     end
 })
@@ -93,6 +98,6 @@ qtiny.NanoLocalRegister({
 
 
 qtiny.AddCloseHandler(function ()
-    tina.GetLogger().Println("i am close!")
+    logger.Println("i am close!")
 end)
 
