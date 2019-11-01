@@ -79,9 +79,12 @@ qtiny.NanoLocalRegister({
     Address = "test.pcall",
     Handler = function(msg)
         local ret, x = pcall(function()
-            panic("i am panic")
-            return 1024
+            --panic("i am panic")
+            error("i am a error")
         end)
+        if x == nil then
+            x = ""
+        end
         qmsg.Reply(msg, 0, "pcall! " .. ret .. " | " .. x)
     end
 })
