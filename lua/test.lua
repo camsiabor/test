@@ -80,13 +80,18 @@ qtiny.NanoLocalRegister({
     Address = "test.pcall",
     Handler = function(msg)
 
-        xpcall(function()
-            error("here?")
-        end, debug.stacktrace)
+        local ok, a, b, c = xpcall(function()
+            error("i am error")
+        end, function(err)
+            return "power", "over", "whelming " .. err
+        end)
 
+        --[[
         local ok, a, b, c = pcall(function()
             return "power", "over", "whelming"
         end)
+        ]]--
+
         if ok then
             qmsg.Reply(msg, 0, "pcall! " .. a .. " | " .. b .. " | " .. c)
         else
